@@ -1,2 +1,2 @@
 # OTA-Dash
-A lightweight web-based dashboard for ESP32 devices that enables wireless setup, OTA firmware updates, serial logs, and manage device configuration all without writing boilerplate code. Ideal for rapidly deploying IoT prototypes and production-ready setups.
+OTA-Dash is a plug-and-play ESP32 library that launches a web-based interface when connected to the device’s access point. It allows developers to perform OTA updates, view logs in real-time, reset or configure Wi-Fi, and manage EEPROM/settings — making it the perfect foundation for any wireless IoT application.
