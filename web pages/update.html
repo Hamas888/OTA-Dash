@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Firmware Update</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      text-align: center; 
+      font-family: "Arial"; 
+      background-color: #e0f7fa; 
+      color: #006064; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container {
+      width: 400px; 
+      height: auto; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px; 
+      background: #ffffff; 
+      padding: 20px; 
+      border-radius: 10px; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+    .button { 
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 10px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: #00838f; 
+      color: #ffffff; 
+      text-decoration: none; 
+      display: inline-block; 
+    }
+    input[type="submit"] {
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 20px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: #00838f; 
+      color: #ffffff; 
+      text-decoration: none; 
+      display: inline-block;
+      width: 180px; 
+      height: 40px; 
+      text-align: center;
+      line-height: 20px; 
+    }
+
+    input[type="file"] { 
+      padding: 10px; 
+      border: 2px dashed #00838f; 
+      border-radius: 5px; 
+      width: 200px; 
+      cursor: pointer; 
+    }
+    #progressContainer {
+      width: 100%;
+      margin-top: 20px;
+      display: none; /* Hidden initially */
+      border: 2px solid #00838f; /* Add border to make it more visible */
+      border-radius: 5px;
+      position: relative;
+    }
+    #progressBar {
+      width: 0%;
+      height: 20px;
+      background-color: #00838f;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+      position: relative;
+    }
+    #progressText {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 0;
+      left: 0;
+      color: #ffffff;
+      font-weight: bold;
+      line-height: 20px; /* Align text vertically */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Firmware Update</h1>
+    <form id="updateForm" enctype="multipart/form-data">
+      <input type="file" id="firmwareFile" name="firmware" accept=".bin" required>
+      <input type="button" value="Update Firmware" class="button" id="updateButton" onclick="submitUpdate()">
+    </form>
+    <div id="progressContainer">
+      <div id="progressBar">
+        <div id="progressText">0%</div> <!-- Percentage text inside the progress bar -->
+      </div>
+    </div>
+    <a href="/" class="button">Back</a>
+    
+    <script>
+      function submitUpdate() {
+        var firmwareFile = document.getElementById('firmwareFile');
+        var updateButton = document.getElementById('updateButton');
+        var progressContainer = document.getElementById('progressContainer');
+        var progressBar = document.getElementById('progressBar');
+        var progressText = document.getElementById('progressText');
+        
+        // Check if a file is selected
+        if (!firmwareFile.files.length) {
+          alert('Please select a firmware file.');
+          return;
+        }
+
+        // Check if the selected file is a .bin file
+        var fileName = firmwareFile.files[0].name;
+        if (!fileName.endsWith('.bin')) {
+          alert('Invalid file selected. Please select a .bin file.');
+          return;
+        }
+    
+        var formData = new FormData(document.getElementById('updateForm'));
+    
+        // Hide the update button and show the progress bar
+        updateButton.style.display = 'none';
+        progressContainer.style.display = 'block';
+
+        // Create XMLHttpRequest object to handle the file upload
+        var xhr = new XMLHttpRequest();
+
+        // Track the upload progress
+        xhr.upload.onprogress = function(event) {
+          if (event.lengthComputable) {
+            var percentComplete = Math.round((event.loaded / event.total) * 100);
+            progressBar.style.width = percentComplete + '%';
+            progressText.textContent = percentComplete + '%'; // Update the percentage text
+          }
+        };
+
+        // Handle the response from the server
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            progressText.textContent = '100%'; // Ensure the text shows 100% on completion
+            alert('Firmware update successful! The device will now restart.');
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
+          } else {
+            alert('Firmware update failed!');
+            resetUI();
+          }
+        };
+
+        // Handle errors
+        xhr.onerror = function() {
+          alert('Firmware update encountered an error!');
+          resetUI();
+        };
+
+        // Send the form data
+        xhr.open('POST', '/update', true);
+        xhr.send(formData);
+
+        function resetUI() {
+          updateButton.style.display = 'block';
+          progressContainer.style.display = 'none';
+          progressBar.style.width = '0%';
+          progressText.textContent = '0%'; // Reset percentage text
+        }
+      }
+    </script>
+  </div>
+</body>
+</html>

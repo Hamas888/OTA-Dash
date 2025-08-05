@@ -1,0 +1,68 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>Erase Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      text-align: center; 
+      font-family: "Arial"; 
+      background-color: #e0f7fa; 
+      color: #006064; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container {
+      width: 400px; 
+      height: auto; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px; 
+      background: #ffffff; 
+      padding: 20px; 
+      border-radius: 10px; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+    input[type="submit"] {
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 20px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: #d32f2f; 
+      color: #ffffff; 
+      text-decoration: none; 
+      display: inline-block;
+      width: 180px; 
+      height: 40px; 
+      text-align: center;
+      line-height: 20px; 
+    }
+    .button { 
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 10px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: #00838f; 
+      color: #ffffff; 
+      text-decoration: none; 
+      display: inline-block; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Erase Settings</h1>
+    <form method="POST" action="/erase">
+      <input type="submit" value="Erase Settings" class="button">
+    </form>
+    <a href="/" class="button">Back</a>
+  </div>
+</body>
+</html>

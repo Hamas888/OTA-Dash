@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Device Control Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      text-align: center; 
+      font-family: "Arial"; 
+      background-color: #e0f7fa; 
+      color: #006064; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container {
+      width: 400px; 
+      height: auto; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px; 
+      background: #ffffff; 
+      padding: 20px; 
+      border-radius: 10px; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+    .button { 
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 10px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: #00838f; 
+      color: #ffffff; 
+      text-decoration: none; 
+      display: inline-block;
+      width: 160px; 
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+    }
+    .note {
+      margin-top: 10px; 
+      font-size: 14px; 
+      color: #004d40; 
+    }
+    .note h5 {
+      margin-bottom: 5px; 
+    }
+    .separator {
+      width: 100%; 
+      height: 1px;
+      background-color: #004d40; 
+      margin: 20px 0px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>%PORTAL_HEADING%</h1>
+    <a href="/info" class="button">Device Info</a>
+    <a href="/wifimanage" class="button">Manage WIFI</a>
+    <a href="/debug" class="button">Wireless Debug</a>
+    <a href="/update" class="button">Update Firmware</a>
+    <a href="/erase" class="button">Erase Settings</a>
+    <a href="/restart" class="button">Restart Device</a>
+    <div class="separator"></div> 
+    <div class="note">
+      <h5>Note</h5>
+      If the update function isn't working, open the portal in your browser: <a href="http://%CUSTOM_DOMAIN%">%CUSTOM_DOMAIN%</a>
+    </div>
+  </div>
+</body>
+</html>

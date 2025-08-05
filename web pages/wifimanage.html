@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiFi Management</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-family: "Arial";
+      background-color: #e0f7fa;
+      color: #006064;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 400px;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #00838f;
+      color: #ffffff;
+      text-decoration: none;
+      display: inline-block;
+      width: 140px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+      color: #004d40;
+    }
+    input[type="text"], input[type="password"], button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .wifi-list {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 30px;
+    }
+    .wifi-item {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .wifi-item:last-child {
+      border-bottom: none;
+    }
+    .wifi-item:hover {
+      background-color: #f0f0f0;
+    }
+    .note {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #004d40;
+    }
+    .note h5 {
+      margin-bottom: 5px;
+    }
+    .separator {
+      width: 100%;
+      height: 1px;
+      background-color: #004d40;
+      margin: 20px 0px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WiFi Management</h1>
+    <div class="wifi-list" id="wifiList">
+        <p>Scanning for networks...</p>
+    </div>
+
+    <div class="form-group">
+      <label for="ssid">SSID</label>
+      <input type="text" id="ssid" placeholder="SSID" readonly>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Password">
+    </div>
+    <div class="button-container">
+      <button class="button" onclick="saveWifi()">Save</button>
+      <button class="button" onclick="window.location.href='/'">Back</button>     
+    </div>
+    <div class="separator"></div>
+    <div class="note">
+        <h5>Note</h5>
+        If the device is not connecting, ensure the credentials are correct.
+    </div>
+  </div>
+
+  <script>
+    let socket = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+    const wifiListContainer = document.getElementById("wifiList");
+    const ssidInput = document.getElementById("ssid");
+    const passwordInput = document.getElementById("password");
+
+    function addWifiNetwork(network) {
+      const wifiItem = document.createElement("div");
+      wifiItem.classList.add("wifi-item");
+      wifiItem.textContent = network.ssid + " (" + network.rssi + " dBm)";
+      wifiItem.onclick = () => {
+        ssidInput.value = network.ssid;
+      };
+      wifiListContainer.appendChild(wifiItem);
+    }
+
+    socket.onmessage = function(event) {
+      const networks = JSON.parse(event.data);
+      wifiListContainer.innerHTML = "";
+      if (networks.length > 0) {
+        networks.forEach(addWifiNetwork);
+      } else {
+        wifiListContainer.innerHTML = "<p>No networks found.</p>";
+      }
+    };
+
+    socket.onopen = function() {
+      console.log("WebSocket connection established.");
+    };
+
+    socket.onclose = function() {
+      console.log("WebSocket connection closed.");
+    };
+
+    socket.onerror = function(error) {
+      console.log("WebSocket Error: " + error);
+    };
+
+    function saveWifi() {
+        const ssid = ssidInput.value;
+        const password = passwordInput.value;
+
+        if (!ssid) {
+            alert("Please select a network.");
+            return;
+        }
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("ssid", ssid);
+        formData.append("password", password);
+
+        fetch('/save-wifi', {
+            method: 'POST',
+            body: formData 
+        })
+        .then(response => {
+            if (response.ok) {
+            alert(response.text);
+            window.location.href = '/';
+            } else {
+            alert("Failed to save WiFi settings.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error saving WiFi settings.');
+        });
+        }
+
+  </script>
+</body>
+</html>
