@@ -16,26 +16,27 @@
   "authors": [
     {
       "name": "Hamas Saeed",
-      "email": "your.email@example.com",
-      "url": "https://github.com/yourusername"
+      "email": "hamasaeed888@gmail.com",
+      "url": "https://github.com/Hamas888",
+      "maintainer": true
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/OTA-Dash.git"
+    "url": "https://github.com/Hamas88/OTA-Dash.git"
   },
   "frameworks": ["arduino"],
   "platforms": ["espressif32"],
   "dependencies": [
     {
       "name": "ESPAsyncWebServer",
-      "owner": "esp32async",
-      "version": "^3.7.10"
+      "owner": "esphome",
+      "version": "^3.0.0"
     },
     {
       "name": "AsyncTCP",
-      "owner": "esp32async",
-      "version": "^3.4.7"
+      "owner": "me-no-dev",
+      "version": "^1.1.1"
     },
     {
       "name": "ArduinoJson",
@@ -52,8 +53,22 @@
     ]
   },
   "license": "MIT",
-  "homepage": "https://github.com/yourusername/OTA-Dash",
+  "homepage": "https://github.com/Hamas888/OTA-Dash",
   "examples": [
-    "examples/*"
-  ]
+    "examples/basic",
+    "examples/advanced"
+  ],
+  "export": {
+    "include": [
+      "src",
+      "examples",
+      "library.json",
+      "README.md"
+    ],
+    "exclude": [
+      "test",
+      ".pio",
+      ".vscode"
+    ]
+  }
 }
