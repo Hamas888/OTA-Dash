@@ -30,12 +30,12 @@
   "dependencies": [
     {
       "name": "ESPAsyncWebServer",
-      "owner": "esphome",
+      "owner": "esp32async",
       "version": "^3.0.0"
     },
     {
       "name": "AsyncTCP",
-      "owner": "me-no-dev",
+      "owner": "esp32async",
       "version": "^1.1.1"
     },
     {
