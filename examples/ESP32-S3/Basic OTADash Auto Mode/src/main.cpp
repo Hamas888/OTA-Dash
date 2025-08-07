@@ -1,0 +1,14 @@
+#include <Arduino.h>
+#include "OTADash.h"
+
+OTADash* otaDash = new OTADash("OTADash", "", "ota-dash", "OTA Dash");
+
+void setup() {
+  Serial.begin(115200);
+  otaDash->begin(AUTO);
+}
+
+void loop() {
+  otaDash->printDebug("Hello World");
+  delay(1000);
+}
