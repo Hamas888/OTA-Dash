@@ -1,28 +1,39 @@
- /*
-  =====================================================================================================
-  * File:    OTADash.h
-  * Author:  Hamas Saeed
-  * Version: Rev_1.0.0
-  * Date:    December 12 2024
-  * Brief:   This File Provide Wireless Intrective Features For IoT Devices Based On ESP32
-  =====================================================================================================
-  * Attention:
-  *                         COPYRIGHT 2024 AMS-IOT Pvt Ltd.
-  *
-  * Licensed under ************* License Agreement V2, (the "License");
-  * Third Party may not use this file except in compliance with the License.
-  * Third Party may obtain a copy of the License at:
-  *
-  *
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  =====================================================================================================
-  */  
+   /*
+ ====================================================================================================
+ * File:        OTADash.h
+ * Author:      Hamas Saeed
+ * Version:     Rev_1.0.0
+ * Date:        Feb 10 2025
+ * Brief:       This Package Provide Wireless Intrective Features For IoT Devices Based On ESP32
+ * 
+ ====================================================================================================
+ * License: 
+ * MIT License
+ * 
+ * Copyright (c) 2025 Hamas Saeed
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * For any inquiries, contact Hamas Saeed at hamasaeed@gmail.com
+ *
+ ====================================================================================================
+ */
 
 #ifndef OTADASH_H
 #define OTADASH_H
@@ -36,10 +47,17 @@
 #include "WebPages.h"
 #include "ArduinoJson.h"
 
-enum class NetworkMode {
+enum NetworkMode {
     ACCESS_POINT,
     STATION,
+    AUTO,
     DUAL
+};
+
+struct NetworkCredentials {
+    char ssid[20];
+    char password[20];
+    char setuped[10];
 };
 
 class OTADash {
@@ -53,37 +71,35 @@ public:
     OTADash(OTADash&&) noexcept = default;                                                                          // Allow move constructor and assignment
     OTADash& operator=(OTADash&&) noexcept = default;
     
-    void stop();
-    void printDebug(const String& message);    
-    String encryptionTypeToString(int encryptionType);
-    void begin(NetworkMode mode = NetworkMode::ACCESS_POINT);
+    void printDebug(const String& message);   
+    void begin(NetworkMode mode = NetworkMode::AUTO); 
     
     void onPaired(std::function<void(JsonDocument&)> callback);
     void onWifiSaved(std::function<void(const String&, const String&)> callback);
     
     void setEEPROMSize(size_t size)         { eepromSize            = size;    }
     void setEEPROMAddress(int address)      { eepromAddress         = address; }
-    void setContentSize(int size)           { contentSize           = size;    }
     void setDebugLogMax(int logs)           { debugLogsMax          = logs;    }
-    void setDebugPageStatus(bool status)    { isOnDebugPage         = status;  }
     void setReconnectAttempts(int attempts) { maxReconnectAttempts  = attempts;}
     void setReconnectDelay(uint32_t delay)  { reconnectDelay        = delay;   }
     void setPairRequest(bool request)       { pairRequest           = request; }
     void setPairResult(bool result)         { pairResult            = result;  }
 
     int getEEPROMAddress()    const         { return eepromAddress;            }
-    int getContentSize()      const         { return eepromAddress;            }
     int getDebugLogsCounter() const         { return debugLogsCounter;         }
     int getDebugLogsMax()     const         { return debugLogsMax;             }
-    bool isConnected()        const         { return isWifiConnected;         }
+    bool isConnected()        const         { return isWifiConnected;          }
     size_t getEEPROMSize()    const         { return eepromSize;               }
     String getSSID()          const         { return WiFi.SSID();              }
     IPAddress getLocalIP()    const         { return WiFi.localIP();           }
     IPAddress getAPIP()       const         { return WiFi.softAPIP();          }
 
+    NetworkCredentials getNetworkCredentials() const {
+        return networkCredentials;
+    }
+
 private:      
     int                                                 eepromAddress           = 0; 
-    int                                                 contentSize             = 0; 
     int                                                 debugLogsCounter        = 0;
     int                                                 debugLogsMax            = 200;
     int                                                 maxReconnectAttempts    = 3;
@@ -93,22 +109,26 @@ private:
     bool                                                autoReconnect           = true;
     bool                                                pairRequest             = false;
     bool                                                pairResult              = false;
-    size_t                                              eepromSize              = 0; 
+    size_t                                              eepromSize              = 50; 
     String                                              debugLogs;
     String                                              customDomain;
     uint32_t                                            reconnectDelay          = 5000;   
     const char*                                         ssid;
     const char*                                         password;
     const char*                                         portal_title;
-    NetworkMode                                         currentMode             = NetworkMode::ACCESS_POINT;
+    NetworkMode                                         currentMode             = NetworkMode::AUTO;
     static OTADash*                                     instance;
     static const byte                                   DNS_PORT                = 53;
+    NetworkCredentials                                  networkCredentials;
     std::unique_ptr<DNSServer>                          dnsServer;
     std::unique_ptr<AsyncWebServer>                     server;
     std::unique_ptr<AsyncWebSocket>                     ws;
     std::function<void(JsonDocument&)>                  pairingCallback;                                                  // User-defined callback
     std::function<void(const String&, const String&)>   wifiSavedCallback;                                                // User-defined callback
 
+    void stop();
+    bool readEEPROM();
+    bool writeEEPROM();
     void setupServer();
     void handleClient();   
     bool startStation();
@@ -119,7 +139,8 @@ private:
     void handlePairingResult(); 
     void handleNetworkFailure();
     static void otaDashTask(void *parameter);
-    void handleWifiScanResult(int scanResult);  
+    void handleWifiScanResult(int scanResult); 
+    String encryptionTypeToString(int encryptionType); 
     static void handleUpdate(AsyncWebServerRequest *request);
     void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
     bool connectToWifi(const char* ssid, const char* password, uint32_t timeout_ms = 20000);

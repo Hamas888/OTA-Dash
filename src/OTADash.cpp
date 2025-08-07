@@ -1,3 +1,40 @@
+   /*
+ ====================================================================================================
+ * File:        OTADash.cpp
+ * Author:      Hamas Saeed
+ * Version:     Rev_1.0.0
+ * Date:        Feb 10 2025
+ * Brief:       This Package Provide Wireless Intrective Features For IoT Devices Based On ESP32
+ * 
+ ====================================================================================================
+ * License: 
+ * MIT License
+ * 
+ * Copyright (c) 2025 Hamas Saeed
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * For any inquiries, contact Hamas Saeed at hamasaeed@gmail.com
+ *
+ ====================================================================================================
+ */
+
 #include "OTADash.h"
 
 OTADash* OTADash::instance = nullptr;
@@ -5,10 +42,12 @@ OTADash* OTADash::instance = nullptr;
 OTADash::OTADash(const char* ssid, const char* password, const char* custom_domain, const char* portal_title) : 
     ssid            (ssid), 
     password        (password), 
-    customDomain    (String(custom_domain) + ".local"), 
+    pairingCallback (nullptr),
+    wifiSavedCallback(nullptr),
     portal_title    (portal_title),
-    server          (std::make_unique<AsyncWebServer>(80)),
     dnsServer       (std::make_unique<DNSServer>()),
+    customDomain    (String(custom_domain) + ".local"), 
+    server          (std::make_unique<AsyncWebServer>(80)),
     ws              (std::make_unique<AsyncWebSocket>("/ws")) {
     instance = this;
 }
@@ -17,7 +56,7 @@ OTADash::~OTADash() {
     try {
         stop();
     } catch (const std::exception& e) {                                                                             // Handle any exceptions that occur during server shutdown
-        Serial.print("[OTAServer Log]: Error during server shutdown: ");
+        Serial.print("[OTADash]: Error during server shutdown: ");
         Serial.println(e.what());
     }
 }
@@ -31,6 +70,27 @@ void OTADash::stop() {
         serverStarted = false;
         Serial.println("Server stopped");
     }
+}
+
+bool OTADash::readEEPROM() {
+    EEPROM.begin(eepromSize);
+    EEPROM.get(eepromAddress, networkCredentials);
+
+    if(strcmp(networkCredentials.setuped, "true") != 0) {
+        EEPROM.end();
+        return false;
+    }
+
+    EEPROM.end();
+    return true;
+}
+
+bool OTADash::writeEEPROM() {
+    EEPROM.begin(eepromSize);
+    EEPROM.put(eepromAddress, networkCredentials);
+    bool success = EEPROM.commit();
+    EEPROM.end();
+    return success;
 }
 
 void OTADash::handleClient() {
@@ -56,29 +116,39 @@ void OTADash::handleClient() {
 void OTADash::begin(NetworkMode mode) {
     currentMode = mode;
     server->reset();
-    Serial.print("[OTAServer Log]: Starting server in ");
+    Serial.println("[OTADash]: Starting server....");
 
-    switch (mode) {
+    if(mode == NetworkMode::STATION || mode == NetworkMode::AUTO || mode == NetworkMode::DUAL) {
+        if(!readEEPROM()) {
+            Serial.println("[OTADash]: Wifi credentials not found. Mode set to ACCESS_POINT");
+            currentMode = NetworkMode::ACCESS_POINT;                                                                // Default to Access Point mode if no credentials are found
+        } else if(mode == NetworkMode::AUTO) {
+            Serial.println("[OTADash]: Auto mode detected. Switching to STATION mode");
+            currentMode = NetworkMode::STATION;                                                                     // Switch to Station mode if AUTO is selected
+        }
+    }
+  
+    switch (currentMode) {
         case NetworkMode::ACCESS_POINT:
-            Serial.println("Access Point mode");
+            Serial.println("[OTADash]: Access Point mode");
             if (!startAccessPoint()) {
-                Serial.println("[OTAServer Log]: Failed to start AP mode");
+                Serial.println("[OTADash]: Failed to start AP mode");
                 return;
             }
             break;
             
         case NetworkMode::STATION:
-            Serial.println("Station mode");
+            Serial.println("[OTADash]: Station mode");
             if (!startStation()) {
-                Serial.println("[OTAServer Log]: Failed to start STA mode");
+                Serial.println("[OTADash]: Failed to start STA mode");
                 return;
             }
             break;
-            
+
         case NetworkMode::DUAL:
-            Serial.println("Dual AP/STA mode");
+            Serial.println("[OTADash]: Dual AP/STA mode");
             if(!startDualMode()) {
-                Serial.println("[OTAServer Log]: Failed to start Dual mode");
+                Serial.println("[OTADash]: Failed to start Dual mode");
                 return;
             }
             break;
@@ -104,7 +174,7 @@ void OTADash::begin(NetworkMode mode) {
                 }
             }
         } catch (const std::exception &e) {
-            Serial.print("[OTAServer Log]: WebSocket error: ");
+            Serial.print("[OTADash]: WebSocket error: ");
             Serial.println(e.what());
         }
     });
@@ -112,18 +182,18 @@ void OTADash::begin(NetworkMode mode) {
     server->addHandler(ws.get());
     setupServer();
     server->begin();
+    Serial.println("[OTADash]: Server started");
 
-    Serial.println("[OTAServer Log]: Server started");
     if (currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) {
-        Serial.print("[OTAServer Log]: Station IP: ");
+        Serial.print("[OTADash]: Station IP: ");
         Serial.println(WiFi.localIP());
-        Serial.println("[OTAServer Log]: Access in the browser by: http://" + WiFi.localIP().toString());
+        Serial.println("[OTADash]: Access in the browser by: http://" + WiFi.localIP().toString());
     }
     if (currentMode == NetworkMode::ACCESS_POINT || currentMode == NetworkMode::DUAL) {
-        Serial.print("[OTAServer Log]: Access point IP: ");
+        Serial.print("[OTADash]: Access point IP: ");
         Serial.println(WiFi.softAPIP());
-        Serial.println("[OTAServer Log]: Access in the browser by: http://" + WiFi.softAPIP().toString());
-        Serial.println("[OTAServer Log]: Access in the browser by: http://" + customDomain);
+        Serial.println("[OTADash]: Access in the browser by: http://" + WiFi.softAPIP().toString());
+        Serial.println("[OTADash]: Access in the browser by: http://" + customDomain);
     }
     serverStarted = true;
 
@@ -144,7 +214,7 @@ void OTADash::printDebug(const String& message) {
         try {
             ws->textAll(formattedMessage);                                                                          // Send the formatted message to all WebSocket clients
         } catch (const std::exception& e) {
-            Serial.print("[OTAServer Log]: Debug print error: ");
+            Serial.print("[OTADash]: Debug print error: ");
             Serial.println(e.what());
         }
 
@@ -175,24 +245,24 @@ void OTADash::disconnectWifi() {
 
 bool OTADash::connectToWifi(const char* ssid, const char* password, uint32_t timeout_ms) {
     if (currentMode == NetworkMode::ACCESS_POINT) {
-        Serial.println("[OTAServer Log]: Cannot connect to WiFi in AP-only mode");
+        Serial.println("[OTADash]: Cannot connect to WiFi in AP-only mode");
         return false;
     }
 
     WiFi.begin(ssid, password);
     
     uint32_t startTime = millis();
-    Serial.print("[OTAServer Log]: Connecting to WiFi ");
+    Serial.print("[OTADash]: Connecting to WiFi ");
     while (WiFi.status() != WL_CONNECTED) {
         if (millis() - startTime >= timeout_ms) {
-            Serial.println("[OTAServer Log]: WiFi connection timeout");
+            Serial.println("[OTADash]: WiFi connection timeout");
             return false;
         }
         delay(500);
         Serial.print(".");
     }
     
-    Serial.println("\n[OTAServer Log]: Connected to WiFi");
+    Serial.println("\n[OTADash]: Connected to WiFi");
     return true;
 }
 
@@ -210,7 +280,7 @@ void OTADash::setupServer() {
     });
 
     server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request){
-        setDebugPageStatus(false);
+        isOnDebugPage = false;
         String html = index_html;
         html.replace("%PORTAL_HEADING%", portal_title);
         html.replace("%CUSTOM_DOMAIN%", customDomain);
@@ -233,11 +303,11 @@ void OTADash::setupServer() {
         deviceInfo += "<tr><td>Flash Size</td><td>"                 + String(ESP.getFlashChipSize() / (1024 * 1024))    + " MB</td></tr>";
         deviceInfo += "<tr><td>Flash Speed</td><td>"                + String(ESP.getFlashChipSpeed() / 1000000)         + " MHz</td></tr>";
         deviceInfo += "<tr><td>Sketch Size</td><td>"                + String(ESP.getSketchSize())                       + " bytes</td></tr>";
-        deviceInfo += "<tr><td>Free Sketch Space</td><td>"          + String(ESP.getFreeSketchSpace())                  + " bytes</td></tr>";
-        deviceInfo += "<tr><td>Heap Size</td><td>"                  + String(ESP.getHeapSize())                         + " bytes</td></tr>";
-        deviceInfo += "<tr><td>Free Heap</td><td>"                  + String(ESP.getFreeHeap())                         + " bytes</td></tr>";
-        deviceInfo += "<tr><td>PSRAM Size</td><td>"                 + String(ESP.getPsramSize())                        + " bytes</td></tr>";
-        deviceInfo += "<tr><td>Free PSRAM</td><td>"                 + String(ESP.getFreePsram())                        + " bytes</td></tr>";
+        deviceInfo += "<tr><td>Free Sketch Space</td><td>"          + String(ESP.getFreeSketchSpace() / (1024 * 1024))  + " MB</td></tr>";
+        deviceInfo += "<tr><td>Heap Size</td><td>"                  + String(ESP.getHeapSize() / (1024 * 1024))         + " MB</td></tr>";
+        deviceInfo += "<tr><td>Free Heap</td><td>"                  + String(ESP.getFreeHeap() / (1024 * 1024))         + " MB</td></tr>";
+        deviceInfo += "<tr><td>PSRAM Size</td><td>"                 + String(ESP.getPsramSize() / (1024 * 1024))        + " MB</td></tr>";
+        deviceInfo += "<tr><td>Free PSRAM</td><td>"                 + String(ESP.getFreePsram() / (1024 * 1024))        + " MB</td></tr>";
 
         deviceInfo += "<tr><td>Uptime</td><td>"                     + String(millis() / 1000)                           + " seconds</td></tr>";
 
@@ -246,7 +316,7 @@ void OTADash::setupServer() {
     });
 
     server->on("/wifimanage", HTTP_GET, [this](AsyncWebServerRequest *request) {
-        Serial.println("[OTAServer Log]: Wi-Fi scan requested");
+        Serial.println("[OTADash]: Wi-Fi scan requested");
         WiFi.scanNetworks(true);                                                                                    // Start scanning
         String html = wifi_manage_html;
         request->send(200, "text/html", html.c_str());
@@ -266,18 +336,23 @@ void OTADash::setupServer() {
                 return;
             }
             
-            Serial.println("[OTAServer Log]: WIFI Saved Request Received");
+            Serial.println("[OTADash]: WIFI Saved Request Received");
 
             if (wifiSavedCallback) {                                                                                // Call the user-defined callback if set
                 wifiSavedCallback(ssid, password);
                 request->send(200, "text/plain", "WiFi credentials saved");
             } else {
-                Serial.println("[OTAServer Log]: SSID:     " + ssid);
-                Serial.println("[OTAServer Log]: Password: " + password);
-                Serial.println("[OTAServer Log]: Missing Saving Callback");
+                Serial.println("[OTADash]: SSID:     " + ssid);
+                Serial.println("[OTADash]: Password: " + password);
+                Serial.println("[OTADash]: Missing Saving Callback, Using Default Method");
+                strcpy(networkCredentials.ssid, ssid.c_str());
+                strcpy(networkCredentials.password, password.c_str());
+                strcpy(networkCredentials.setuped, "true");
+                writeEEPROM();
+                request->send(200, "text/plain", "Missing Saving Callback");
+                ESP.restart();
             }
-
-            request->send(200, "text/plain", "Missing Saving Callback");
+            
         } else {
             request->send(400, "text/plain", "Missing SSID or password");
         }
@@ -297,41 +372,30 @@ void OTADash::setupServer() {
         request->send(200, "text/html", html.c_str());
     });
 
+    server->on("/erase", HTTP_POST, [this](AsyncWebServerRequest *request){
+        strcpy(networkCredentials.ssid, "");
+        strcpy(networkCredentials.password, "");
+        strcpy(networkCredentials.setuped, "false");
+        writeEEPROM();
+        request->send(200, "text/html", "Settings erased.");
+    });
+
     server->on("/debug", HTTP_GET, [this](AsyncWebServerRequest *request){
         String html = debug_html;
-        setDebugPageStatus(true);
+        isOnDebugPage = true;
         html.replace("%PORTAL_HEADING%", portal_title);
         request->send(200, "text/html", html.c_str());
     });
 
-    server->on("/save-wifi", HTTP_POST, [this](AsyncWebServerRequest *request) {
-        if (request->hasParam("ssid", true) && request->hasParam("password", true)) {
-            String ssid = request->getParam("ssid", true)->value();
-            String password = request->getParam("password", true)->value();
+    server->on("/restart", HTTP_GET, [this](AsyncWebServerRequest *request){
+        String html = restart_device_html;
+        request->send(200, "text/html", html.c_str());
+    });
 
-            if (ssid.isEmpty()) {
-                request->send(400, "text/plain", "SSID cannot be empty");
-                return;
-            }
-            if (password.length() < 8) {
-                request->send(400, "text/plain", "Password must be at least 8 characters");
-                return;
-            }
-
-            Serial.println("[OTAServer Log]: WIFI Saved Request Received");
-
-            if (wifiSavedCallback) { // Call the user-defined callback if set
-                wifiSavedCallback(ssid, password);
-                request->send(200, "text/plain", "WiFi credentials saved");
-            } else {
-                Serial.println("[OTAServer Log]: SSID:     " + ssid);
-                Serial.println("[OTAServer Log]: Password: " + password);
-                Serial.println("[OTAServer Log]: Missing Saving Callback");
-                request->send(500, "text/plain", "Missing Saving Callback");
-            }
-        } else {
-            request->send(400, "text/plain", "Missing SSID or password");
-        }
+    server->on("/restart", HTTP_POST, [this](AsyncWebServerRequest *request){
+        request->send(200, "text/html", "Device is restarting...<br/>Please wait a moment.");
+        vTaskDelay(1000);
+        ESP.restart();
     });
 
     server->on("/generate_204", HTTP_GET, [this](AsyncWebServerRequest *request){
@@ -359,7 +423,7 @@ void OTADash::setupServer() {
 
     server->on("/pair", HTTP_POST, [this](AsyncWebServerRequest *request) {
     }, nullptr, [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) { 
-        Serial.println("[OTAServer Log]: Pairing request received");      
+        Serial.println("[OTADash]: Pairing request received");      
         if (len == 0) {
             AsyncWebServerResponse *response = request->beginResponse(400, "application/json", "{\"status\":\"error\",\"message\":\"Empty request body\"}");
             response->addHeader("Access-Control-Allow-Origin", "*");
@@ -397,13 +461,13 @@ void OTADash::setupServer() {
             return;
         }
         
-        Serial.println("[OTAServer Log]: Received Pairing Data:");
+        Serial.println("[OTADash]: Received Pairing Data:");
         for (size_t i = 0; i < user_ids.size(); i++) {
-            Serial.println("[OTAServer Log]: User ID:       " + String((const char*)user_ids[i]));
+            Serial.println("[OTADash]: User ID:       " + String((const char*)user_ids[i]));
         }
-        Serial.println("[OTAServer Log]: WiFi SSID:     " + wifi_ssid);
-        Serial.println("[OTAServer Log]: WiFi Password: " + wifi_password);
-        Serial.println("[OTAServer Log]: Master PIN:    " + master_pin);
+        Serial.println("[OTADash]: WiFi SSID:     " + wifi_ssid);
+        Serial.println("[OTADash]: WiFi Password: " + wifi_password);
+        Serial.println("[OTADash]: Master PIN:    " + master_pin);
 
         AsyncWebServerResponse *response;
 
@@ -411,7 +475,7 @@ void OTADash::setupServer() {
             pairingCallback(jsonDoc);
             response = request->beginResponse(202, "application/json", "{\"status\":\"success\",\"message\":\"Request Accepted: Listen On Websocket\"}");
         } else {
-            Serial.println("[OTAServer Log]: Missing Pairing Callback");
+            Serial.println("[OTADash]: Missing Pairing Callback");
             response = request->beginResponse(500, "application/json", "{\"status\":\"error\",\"message\":\"Missing Pairing Functionality\"}");
         }
         response->addHeader("Access-Control-Allow-Origin", "*");
@@ -421,7 +485,7 @@ void OTADash::setupServer() {
 
 bool OTADash::startStation() {
     WiFi.mode(WIFI_STA);
-    return connectToWifi(ssid, password);; 
+    return connectToWifi(networkCredentials.ssid, networkCredentials.password);
 }
 
 bool OTADash::startDualMode() {
@@ -429,7 +493,7 @@ bool OTADash::startDualMode() {
     WiFi.mode(WIFI_AP_STA);
     result = WiFi.softAP(String(ssid + String("_AP")).c_str(), password);
     if (!connectToWifi(ssid, password)) {
-        Serial.println("[OTAServer Log]: Failed to connect in Dual mode");
+        Serial.println("[OTADash]: Failed to connect in Dual mode");
         return false;
     }
     return true && result;
@@ -460,7 +524,7 @@ void OTADash::handleUpdate(AsyncWebServerRequest *request) {
 void OTADash::handleUpload(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
     try {
         if (!index) {
-            Serial.printf("[OTAServer Log]: Update Start: %s\n", filename.c_str());
+            Serial.printf("[OTADash]: Update Start: %s\n", filename.c_str());
             if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { 
                 Update.printError(Serial);
             }
@@ -472,13 +536,13 @@ void OTADash::handleUpload(AsyncWebServerRequest *request, const String& filenam
         }
         if (final) {
             if (Update.end(true)) {
-                Serial.printf("[OTAServer Log]: Update Success: %u B\n", index + len);
+                Serial.printf("[OTADash]: Update Success: %u B\n", index + len);
             } else {
                 Update.printError(Serial);
             }
         }
     } catch (const std::exception& e) {
-        Serial.print("[OTAServer Log]: Update error: ");
+        Serial.print("[OTADash]: Update error: ");
         Serial.println(e.what());
     }
 }
@@ -486,10 +550,10 @@ void OTADash::handleUpload(AsyncWebServerRequest *request, const String& filenam
 void OTADash::handlePairingResult() {
     String response;
     if(pairResult) {
-        Serial.println("[OTAServer Log]: Pairing successful");
+        Serial.println("[OTADash]: Pairing successful");
         response = "{\"status\":\"success\",\"message\":\"Pairing successful\"}";
     } else {
-        Serial.println("[OTAServer Log]: Pairing failed");
+        Serial.println("[OTADash]: Pairing failed");
         response = "{\"status\":\"error\",\"message\":\"Pairing failed\"}";
     }
     pairRequest = pairResult = false;
@@ -498,9 +562,9 @@ void OTADash::handlePairingResult() {
 
 void OTADash::handleWifiScanResult(int scanResult) {
     if (scanResult == WIFI_SCAN_FAILED) {
-        Serial.println("[OTAServer Log]: Wi-Fi scan failed");
+        Serial.println("[OTADash]: Wi-Fi scan failed");
     } else {       
-        Serial.println("[OTAServer Log]: Wi-Fi scan completed");
+        Serial.println("[OTADash]: Wi-Fi scan completed");
         String networks = "[";
         for (int i = 0; i < scanResult; i++) {
             if (i > 0) networks += ",";
@@ -555,12 +619,12 @@ void OTADash::handleNetworkFailure() {
     
     if (millis() - lastReconnectAttempt >= reconnectDelay) {
         if (reconnectCount < maxReconnectAttempts) {
-            Serial.println("[OTAServer Log]: Attempting to reconnect to WiFi...");
+            Serial.println("[OTADash]: Attempting to reconnect to WiFi...");
             reconnectWifi();
             reconnectCount++;
             lastReconnectAttempt = millis();
         } else {
-            Serial.println("[OTAServer Log]: Max reconnection attempts reached");
+            Serial.println("[OTADash]: Max reconnection attempts reached");
             reconnectCount = 0;
         }
     }
