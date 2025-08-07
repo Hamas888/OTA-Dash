@@ -560,6 +560,25 @@ void OTADash::handlePairingResult() {
     ws->textAll(response);
 }
 
+void OTADash::otaDashTask(void *parameter) {
+    OTADash* dash = static_cast<OTADash*>(parameter);
+    unsigned long previousMillis = 0;
+    while(dash->serverStarted) {
+        dash->handleClient();
+        vTaskDelay(10);
+
+        if(millis() - previousMillis >= 10000 && dash->currentMode == NetworkMode::STATION) {
+            previousMillis = millis();
+            dash->isWifiConnected = WiFi.status() == WL_CONNECTED;
+
+            if (!dash->isWifiConnected) {
+                dash->handleNetworkFailure();
+            }
+        }
+    }
+    vTaskDelete(NULL);
+}
+
 void OTADash::handleWifiScanResult(int scanResult) {
     if (scanResult == WIFI_SCAN_FAILED) {
         Serial.println("[OTADash]: Wi-Fi scan failed");
@@ -592,25 +611,6 @@ void OTADash::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
             printDebug("Received message: " + message);
         }
     }
-}
-
-void OTADash::otaDashTask(void *parameter) {
-    OTADash* dash = static_cast<OTADash*>(parameter);
-    unsigned long previousMillis = 0;
-    while(dash->serverStarted) {
-        dash->handleClient();
-        vTaskDelay(10);
-
-        if(millis() - previousMillis >= 10000 && dash->currentMode == NetworkMode::STATION) {
-            previousMillis = millis();
-            dash->isWifiConnected = WiFi.status() == WL_CONNECTED;
-
-            if (!dash->isWifiConnected) {
-                dash->handleNetworkFailure();
-            }
-        }
-    }
-    vTaskDelete(NULL);
 }
 
 void OTADash::handleNetworkFailure() {
