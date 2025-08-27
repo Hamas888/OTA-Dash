@@ -510,15 +510,21 @@ void OTADash::reconnectWifi() {
 }
 
 void OTADash::handleUpdate(AsyncWebServerRequest *request) {
+    bool hasError = Update.hasError();
+    int statusCode = hasError ? 500 : 200;                                                // Return 500 on update error
     AsyncWebServerResponse *response = request->beginResponse(
-        200, 
-        "text/plain", 
-        (Update.hasError()) ? "FAIL" : "OK"
+        statusCode,
+        "text/plain",
+        hasError ? "FAIL" : "OK"
     );
     response->addHeader("Connection", "close");
     request->send(response);
-    delay(1000);
-    ESP.restart();
+
+    xTaskCreate([](void *param) {
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        ESP.restart();
+        vTaskDelete(NULL);
+    }, "ota_restart", 2048, NULL, 1, NULL);
 }
 
 void OTADash::handleUpload(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
