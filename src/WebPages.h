@@ -176,7 +176,10 @@ static const char device_info_html[] PROGMEM = R"rawliteral(
     th, td {
       padding: 10px;
       border: 1px solid #ddd;
-      width: 25%; 
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      text-align: left;
     }
     th {
       background-color: #f2f2f2;

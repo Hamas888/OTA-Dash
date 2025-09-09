@@ -77,13 +77,15 @@ public:
     void onPaired(std::function<void(JsonDocument&)> callback);
     void onWifiSaved(std::function<void(const String&, const String&)> callback);
     
-    void setEEPROMSize(size_t size)         { eepromSize            = size;    }
-    void setEEPROMAddress(int address)      { eepromAddress         = address; }
     void setDebugLogMax(int logs)           { debugLogsMax          = logs;    }
-    void setReconnectAttempts(int attempts) { maxReconnectAttempts  = attempts;}
-    void setReconnectDelay(uint32_t delay)  { reconnectDelay        = delay;   }
-    void setPairRequest(bool request)       { pairRequest           = request; }
+    void setEEPROMSize(size_t size)         { eepromSize            = size;    }
     void setPairResult(bool result)         { pairResult            = result;  }
+    void setProductName(String name)        { productName           = name;    }
+    void setPairRequest(bool request)       { pairRequest           = request; }
+    void setEEPROMAddress(int address)      { eepromAddress         = address; }
+    void setReconnectDelay(uint32_t delay)  { reconnectDelay        = delay;   }
+    void setReconnectAttempts(int attempts) { maxReconnectAttempts  = attempts;}
+    void setFirmwareVersion(String version) { firmwareVersion       = version; }
 
     int getEEPROMAddress()    const         { return eepromAddress;            }
     int getDebugLogsCounter() const         { return debugLogsCounter;         }
@@ -112,6 +114,8 @@ private:
     size_t                                              eepromSize              = 50; 
     String                                              debugLogs;
     String                                              customDomain;
+    String                                              firmwareVersion         = "Not Configured";
+    String                                              productName             = "ESP32 Device"
     uint32_t                                            reconnectDelay          = 5000;   
     const char*                                         ssid;
     const char*                                         password;
