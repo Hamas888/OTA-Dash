@@ -115,7 +115,7 @@ private:
     String                                              debugLogs;
     String                                              customDomain;
     String                                              firmwareVersion         = "Not Configured";
-    String                                              productName             = "ESP32 Device"
+    String                                              productName             = "ESP32 Device";
     uint32_t                                            reconnectDelay          = 5000;   
     const char*                                         ssid;
     const char*                                         password;
