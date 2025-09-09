@@ -292,7 +292,7 @@ void OTADash::setupServer() {
         String deviceInfo;
         deviceInfo =  "<tr><td>Product Name</td><td>"               + productName                                       + "</td></tr>";
         deviceInfo += "<tr><td>Firmware Version</td><td>"           + firmwareVersion                                   + "</td></tr>";
-        deviceInfo =  "<tr><td>Chip Model</td><td>"                 + String(ESP.getChipModel())                        + "</td></tr>";
+        deviceInfo +=  "<tr><td>Chip Model</td><td>"                 + String(ESP.getChipModel())                        + "</td></tr>";
         deviceInfo += "<tr><td>Chip Cores</td><td>"                 + String(ESP.getChipCores())                        + "</td></tr>";
         deviceInfo += "<tr><td>Chip Revision</td><td>"              + String(ESP.getChipRevision())                     + "</td></tr>";
         deviceInfo += "<tr><td>CPU Frequency</td><td>"              + String(ESP.getCpuFreqMHz())                       + " MHz</td></tr>";
