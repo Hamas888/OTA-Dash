@@ -55,14 +55,14 @@
   "license": "MIT",
   "homepage": "https://github.com/Hamas888/OTA-Dash",
   "examples": [
-    "examples/basic",
-    "examples/advanced"
+    "examples/ESP32-S3"
   ],
   "export": {
     "include": [
       "src",
       "examples",
       "library.json",
+      "LICENSE",
       "README.md"
     ],
     "exclude": [
