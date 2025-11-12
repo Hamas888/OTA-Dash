@@ -38,8 +38,6 @@
 #ifndef WEBPAGES_H
 #define WEBPAGES_H
 
-#define OTADASH_DEVICE_INFO
-
 #ifndef WEBPAGES_BUTTON_COLOR
   #define WEBPAGES_BUTTON_COLOR "#00838f"
 #endif
@@ -64,80 +62,6 @@
   #define WEBPAGES_BACKGROUND_2_COLOR "#ffffff"
 #endif
 
-
-#ifndef WEBPAGES_BODY_CSS
-  #define WEBPAGES_BODY_CSS R"rawliteral(                                         \
-    body {                                                                        \
-      color:              )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(;      \
-      margin:             0;                                                      \
-      padding:            0;                                                      \
-      display:            flex;                                                   \
-      text-align:         center;                                                 \
-      font-family:        "Arial";                                                \
-      align-items:        center;                                                 \
-      justify-content:    center;                                                 \
-      background-color:   )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(;   \
-    }                                                                             \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_NOTE_CSS
-  #define WEBPAGES_NOTE_CSS R"rawliteral(                                         \
-    .note {                                                                       \
-      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;       \
-      font-size:          14px;                                                   \
-      margin-top:         10px;                                                   \
-    }                                                                             \
-    .note h5 {                                                                    \
-      margin-bottom:      5px;                                                    \
-    }                                                                             \
-    .separator {                                                                  \
-      width:              100%;                                                   \
-      height:             1px;                                                    \
-      margin:            20px 0px;                                                \
-      background-color:  )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;        \
-    }                                                                             \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_BUTTON_CSS
-  #define WEBPAGES_BUTTON_CSS R"rawliteral(                                       \
-    .button {                                                                     \
-      color:              )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(;  \
-      width:              160px;                                                  \
-      height:             20px;                                                   \
-      cursor:             pointer;                                                \
-      border:             none;                                                   \
-      margin:             10px;                                                   \
-      padding:            10px 20px;                                              \
-      display:            inline-block;                                           \
-      font-size:          18px;                                                   \
-      text-align:         center;                                                 \
-      line-height:        20px;                                                   \
-      border-radius:      5px;                                                    \
-      text-decoration:    none;                                                   \
-      background-color:   )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(;       \
-    }                                                                             \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_CONTAINER_CSS
-  #define WEBPAGES_CONTAINER_CSS R"rawliteral(                                    \
-    .container {                                                                  \
-      width:              400px;                                                  \
-      height:             auto;                                                   \
-      padding:            20px;                                                   \
-      display:            flex;                                                   \
-      margin-top:         50px;                                                   \
-      background:         )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; \
-      box-shadow:         0 0 10px rgba(0, 0, 0, 0.1);                          \
-      align-items:        center;                                                 \
-      border-radius:      10px;                                                   \
-      flex-direction:     column;                                                 \
-    }                                                                             \
-  )rawliteral"
-#endif
-
 static const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
@@ -145,9 +69,59 @@ static const char index_html[] = R"rawliteral(
   <title>Device Control Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    )rawliteral" (
-      WEBPAGES_BODY_CSS + WEBPAGES_CONTAINER_CSS + WEBPAGES_BUTTON_CSS + WEBPAGES_NOTE_CSS
-    ) R"rawliteral(
+    body {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      text-align: center; 
+      font-family: "Arial"; 
+      background-color: )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(; 
+      color: )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .container {
+      width: 400px; 
+      height: auto; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px; 
+      background: )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; 
+      padding: 20px; 
+      border-radius: 10px; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+    .button { 
+      padding: 10px 20px; 
+      font-size: 18px; 
+      margin: 10px; 
+      cursor: pointer; 
+      border: none; 
+      border-radius: 5px; 
+      background-color: )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(; 
+      color: )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(; 
+      text-decoration: none; 
+      display: inline-block;
+      width: 160px; 
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+    }
+    .note {
+      margin-top: 10px; 
+      font-size: 14px; 
+      color: )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(; 
+    }
+    .note h5 {
+      margin-bottom: 5px; 
+    }
+    .separator {
+      width: 100%; 
+      height: 1px;
+      background-color: )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(; 
+      margin: 20px 0px;
+    }
   </style>
 </head>
 <body>
@@ -169,7 +143,6 @@ static const char index_html[] = R"rawliteral(
 </html>
 )rawliteral";
 
-#ifdef OTADASH_DEVICE_INFO
 static const char device_info_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
@@ -182,8 +155,8 @@ static const char device_info_html[] = R"rawliteral(
       align-items: center;
       text-align: center; 
       font-family: "Arial"; 
-      background-color:  )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(; 
+      background-color:  )rawliteral"  WEBPAGES_BACKGROUND_COLOR  R"rawliteral(; 
+      color: )rawliteral"  WEBPAGES_PRIMARY_COLOR  R"rawliteral(; 
       margin: 0; 
       padding: 0; 
     }
@@ -269,7 +242,6 @@ static const char device_info_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
-#endif
 
 static const char wifi_manage_html[] = R"rawliteral(
 <!DOCTYPE HTML>

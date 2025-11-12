@@ -1,0 +1,74 @@
+{
+  "name": "OTA-Dash",
+  "version": "1.0.1",
+  "description": "A plug-and-play OTA and configuration dashboard for ESP32-S3 devices using a web interface.",
+  "keywords": [
+    "esp32",
+    "esp32-s3",
+    "ota",
+    "iot",
+    "webserver",
+    "dashboard",
+    "async",
+    "wifi",
+    "firmware"
+  ],
+  "authors": [
+    {
+      "name": "Hamas Saeed",
+      "email": "hamasaeed888@gmail.com",
+      "url": "https://github.com/Hamas888",
+      "maintainer": true
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hamas88/OTA-Dash.git"
+  },
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32"],
+  "dependencies": [
+    {
+      "name": "ESPAsyncWebServer",
+      "owner": "esp32async",
+      "version": "^3.0.0"
+    },
+    {
+      "name": "AsyncTCP",
+      "owner": "esp32async",
+      "version": "^3.4.7"
+    },
+    {
+      "name": "ArduinoJson",
+      "owner": "bblanchon",
+      "version": "^7.4.2"
+    }
+  ],
+  "build": {
+    "flags": [
+      "-std=gnu++17"
+    ],
+    "unflags": [
+      "-std=gnu++11"
+    ]
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Hamas888/OTA-Dash",
+  "examples": [
+    "examples/ESP32-S3"
+  ],
+  "export": {
+    "include": [
+      "src",
+      "examples",
+      "library.json",
+      "LICENSE",
+      "README.md"
+    ],
+    "exclude": [
+      "test",
+      ".pio",
+      ".vscode"
+    ]
+  }
+}
