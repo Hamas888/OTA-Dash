@@ -2,69 +2,7 @@
 <head>
   <title>Device Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-    width: 400px; 
-      height: auto;
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 140px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    table {
-      width: 100%;
-      table-layout: fixed;
-      border-collapse: collapse;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      word-wrap: break-word;
-      word-break: break-word;
-      white-space: normal;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-      text-align: center;
-    }
-    tr {
-      height: 50px; 
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -74,6 +12,10 @@
       %DEVICE_INFO%
     </table>
     <a href="/" class="button">Back</a>
+    <a href="/about" class="button">About</a>
+    <div class="footer">
+      Developed by <a href="https://github.com/Hamas888" target="_blank">Hamas Saeed</a>
+    </div>
   </div>
 </body>
 </html>

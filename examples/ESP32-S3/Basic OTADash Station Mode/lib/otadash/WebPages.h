@@ -38,29 +38,11 @@
 #ifndef WEBPAGES_H
 #define WEBPAGES_H
 
-#ifndef WEBPAGES_BUTTON_COLOR
-  #define WEBPAGES_BUTTON_COLOR "#00838f"
-#endif
-
-#ifndef WEBPAGES_BUTTON_TEXT_COLOR
-  #define WEBPAGES_BUTTON_TEXT_COLOR "#ffffff"
-#endif
-
-#ifndef WEBPAGES_ACCENT_COLOR
-  #define WEBPAGES_ACCENT_COLOR "#004d40"
-#endif
-
-#ifndef WEBPAGES_PRIMARY_COLOR
-  #define WEBPAGES_PRIMARY_COLOR "#006064"
-#endif
-
-#ifndef WEBPAGES_BACKGROUND_COLOR
-  #define WEBPAGES_BACKGROUND_COLOR "#e0f7fa"
-#endif
-
-#ifndef WEBPAGES_BACKGROUND_2_COLOR
-  #define WEBPAGES_BACKGROUND_2_COLOR "#ffffff"
-#endif
+#define OTADASH_DEVICE_INFO               1
+#define OTADASH_WIFI_MANAGER              1
+#define OTADASH_FIRMWARE_UPDATE           1
+#define OTADASH_ERASE_SETTINGS            1
+#define OTADASH_DEBUG_PAGE                1
 
 static const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
@@ -68,61 +50,7 @@ static const char index_html[] = R"rawliteral(
 <head>
   <title>Device Control Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 160px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    .note {
-      margin-top: 10px; 
-      font-size: 14px; 
-      color: )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(; 
-    }
-    .note h5 {
-      margin-bottom: 5px; 
-    }
-    .separator {
-      width: 100%; 
-      height: 1px;
-      background-color: )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(; 
-      margin: 20px 0px;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -143,88 +71,13 @@ static const char index_html[] = R"rawliteral(
 </html>
 )rawliteral";
 
+#if OTADASH_DEVICE_INFO
 static const char device_info_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Device Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color:  )rawliteral"  WEBPAGES_BACKGROUND_COLOR  R"rawliteral(; 
-      color: )rawliteral"  WEBPAGES_PRIMARY_COLOR  R"rawliteral(; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-    width: 400px; 
-      height: auto;
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 140px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    table {
-      width: 100%;
-      table-layout: fixed;
-      border-collapse: collapse;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      word-wrap: break-word;
-      word-break: break-word;
-      white-space: normal;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-      text-align: center;
-    }
-    tr {
-      height: 50px; 
-    }
-    .footer {
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-      font-size: 11px;
-      color: #666;
-    }
-    .footer a {
-      color: #00838f;
-      text-decoration: none;
-    }
-    .footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -242,7 +95,9 @@ static const char device_info_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_DEVICE_INFO
 
+#if OTADASH_WIFI_MANAGER
 static const char wifi_manage_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html lang="en">
@@ -250,109 +105,7 @@ static const char wifi_manage_html[] = R"rawliteral(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WiFi Management</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-family: "Arial";
-      background-color: #e0f7fa;
-      color: #006064;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 400px;
-      height: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin: 10px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #00838f;
-      color: #ffffff;
-      text-decoration: none;
-      display: inline-block;
-      width: 140px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 16px;
-      color: #004d40;
-    }
-    input[type="text"], input[type="password"], button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    .wifi-list {
-      margin-top: 20px;
-      width: 100%;
-      padding: 10px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-height: 250px;
-      overflow-y: auto;
-      margin-bottom: 30px;
-    }
-    .wifi-item {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      cursor: pointer;
-    }
-    .wifi-item:last-child {
-      border-bottom: none;
-    }
-    .wifi-item:hover {
-      background-color: #f0f0f0;
-    }
-    .note {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #004d40;
-    }
-    .note h5 {
-      margin-bottom: 5px;
-    }
-    .separator {
-      width: 100%;
-      height: 1px;
-      background-color: #004d40;
-      margin: 20px 0px;
-    }
-    .button-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      width: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -458,100 +211,16 @@ static const char wifi_manage_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_WIFI_SETTINGS
 
+#if OTADASH_FIRMWARE_UPDATE
 static const char update_firmware_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
   <title>Firmware Update</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-
-    input[type="file"] { 
-      padding: 10px; 
-      border: 2px dashed #00838f; 
-      border-radius: 5px; 
-      width: 200px; 
-      cursor: pointer; 
-    }
-    #progressContainer {
-      width: 100%;
-      margin-top: 20px;
-      display: none; /* Hidden initially */
-      border: 2px solid #00838f; /* Add border to make it more visible */
-      border-radius: 5px;
-      position: relative;
-    }
-    #progressBar {
-      width: 0%;
-      height: 20px;
-      background-color: #00838f;
-      border-radius: 5px;
-      transition: width 0.4s ease;
-      position: relative;
-    }
-    #progressText {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      top: 0;
-      left: 0;
-      color: #ffffff;
-      font-weight: bold;
-      line-height: 20px; /* Align text vertically */
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -642,142 +311,41 @@ static const char update_firmware_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_FIRMWARE_UPDATE
 
+#if OTADASH_ERASE_SETTINGS
 static const char erase_settings_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Erase Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #d32f2f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <h1>Erase Settings</h1>
     <form method="POST" action="/erase">
-      <input type="submit" value="Erase Settings" class="button">
+      <input type="submit" value="Erase Settings" class="button erase-submit">
     </form>
     <a href="/" class="button">Back</a>
   </div>
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_ERASE_SETTINGS
 
 static const char restart_device_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Restart Device</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #f09c3d; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <h1>Restart Device</h1>
     <form id="restartForm">
-      <input type="button" value="Restart Device" class="button" onclick="submitRestart()">
+      <input type="button" value="Restart Device" class="button restart-submit" onclick="submitRestart()">
     </form>
     <a href="/" class="button">Back</a>
     
@@ -807,78 +375,83 @@ static const char restart_device_html[] = R"rawliteral(
 </html>
 )rawliteral";
 
+#if OTADASH_DEBUG_PAGE
 const char debug_html[] = R"rawliteral(
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Wireless Debug</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .log-screen {
-      border: 1px solid #ccc;
-      background-color: #fff;
-      width: 300px;
-      height: 500px;
-      overflow-y: scroll;
-      padding: 10px;
-      text-align: left; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
   <div class="container">
     <h1>%PORTAL_HEADING% Debug Logs</h1>
+
     <div class="log-screen" id="logs">
+      <span style="color: #888888;">[Debug Console Ready - Waiting for messages...]</span><br />
     </div>
-    <a href="/" class="button">Back</a>
+
+    <div style="margin-top: 10px;">
+      <button onclick="clearLogs()" class="button" style="margin-right: 10px;">Clear Logs</button>
+      <a href="/" class="button">Back</a>
+    </div>
   </div>
+
   <script>
-    var ws = new WebSocket(`ws://${window.location.hostname}/ws`);
-    ws.onmessage = function(event) {
-      var logsDiv = document.getElementById('logs');
-      logsDiv.innerHTML += event.data + "<br/>";
-      logsDiv.scrollTop = logsDiv.scrollHeight; // Auto-scroll to the bottom
-    };
+    let ws;
+    const reconnectInterval = 5000;
+
+    function connectWebSocket() {
+      try {
+        ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+        ws.onopen = () => {
+          console.log("WebSocket connected");
+          appendLog("[WebSocket Connected]", "#00ff00");
+        };
+
+        ws.onmessage = (event) => {
+          const logsDiv = document.getElementById("logs");
+          logsDiv.innerHTML += event.data + "<br/>";
+          logsDiv.scrollTop = logsDiv.scrollHeight;
+        };
+
+        ws.onclose = () => {
+          console.log("WebSocket disconnected");
+          appendLog("[WebSocket Disconnected - Reconnecting...]", "#ff0000");
+          setTimeout(connectWebSocket, reconnectInterval);
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          appendLog("[WebSocket Error]", "#ff0000");
+        };
+      } catch (e) {
+        console.error("Failed to create WebSocket:", e);
+        appendLog("[Failed to connect WebSocket]", "#ff0000");
+        setTimeout(connectWebSocket, reconnectInterval);
+      }
+    }
+
+    function appendLog(message, color) {
+      const logsDiv = document.getElementById("logs");
+      logsDiv.innerHTML += `<span style="color: ${color};">${message}</span><br/>`;
+    }
+
+    function clearLogs() {
+      document.getElementById("logs").innerHTML =
+        '<span style="color: #888888;">[Debug Console Cleared]</span><br/>';
+    }
+
+    connectWebSocket();
   </script>
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_DEBUG_PAGE
 
 static const char about_html[] = R"rawliteral(
 <!DOCTYPE HTML>
@@ -886,98 +459,7 @@ static const char about_html[] = R"rawliteral(
 <head>
   <title>About OTA-Dash</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto;
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 140px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    .button:hover {
-      background-color: #006064;
-      transition: 0.3s;
-    }
-    .content {
-      text-align: left;
-      margin: 20px 0;
-      font-size: 14px;
-      line-height: 1.8;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      margin: 0;
-      color: #00838f;
-    }
-    .header p {
-      margin: 5px 0;
-      font-size: 12px;
-      color: #666;
-    }
-    .credits {
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 15px 0;
-    }
-    .credits h3 {
-      margin-top: 0;
-      color: #004d40;
-      font-size: 14px;
-    }
-    .credits p {
-      margin: 8px 0;
-      font-size: 13px;
-    }
-    .credits a {
-      color: #00838f;
-      text-decoration: none;
-    }
-    .credits a:hover {
-      text-decoration: underline;
-    }
-    .separator {
-      width: 100%; 
-      height: 1px;
-      background-color: #ddd; 
-      margin: 15px 0;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">

@@ -38,103 +38,65 @@
 #ifndef WEBPAGES_H
 #define WEBPAGES_H
 
-#define OTADASH_DEVICE_INFO
+#define OTADASH_DEVICE_INFO               1
+#define OTADASH_WIFI_MANAGER              1
+#define OTADASH_FIRMWARE_UPDATE           1
+#define OTADASH_ERASE_SETTINGS            1
+#define OTADASH_DEBUG_PAGE                1
 
-#ifndef WEBPAGES_BUTTON_COLOR
-  #define WEBPAGES_BUTTON_COLOR "#00838f"
-#endif
-
-#ifndef WEBPAGES_BUTTON_TEXT_COLOR
-  #define WEBPAGES_BUTTON_TEXT_COLOR "#ffffff"
-#endif
-
-#ifndef WEBPAGES_ACCENT_COLOR
-  #define WEBPAGES_ACCENT_COLOR "#004d40"
-#endif
-
-#ifndef WEBPAGES_PRIMARY_COLOR
-  #define WEBPAGES_PRIMARY_COLOR "#006064"
-#endif
-
-#ifndef WEBPAGES_BACKGROUND_COLOR
-  #define WEBPAGES_BACKGROUND_COLOR "#e0f7fa"
-#endif
-
-#ifndef WEBPAGES_BACKGROUND_2_COLOR
-  #define WEBPAGES_BACKGROUND_2_COLOR "#ffffff"
-#endif
-
-
-#ifndef WEBPAGES_BODY_CSS
-  #define WEBPAGES_BODY_CSS R"rawliteral(                                         \
-    body {                                                                        \
-      color:              )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(;      \
-      margin:             0;                                                      \
-      padding:            0;                                                      \
-      display:            flex;                                                   \
-      text-align:         center;                                                 \
-      font-family:        "Arial";                                                \
-      align-items:        center;                                                 \
-      justify-content:    center;                                                 \
-      background-color:   )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(;   \
-    }                                                                             \
+#ifndef WEBPAGES_INPUT_SUBMIT_CSS
+  #define WEBPAGES_INPUT_SUBMIT_CSS R"rawliteral(                                       \
+    input[type="submit"] {                                                              \
+      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;               \
+      width:              180px;                                                        \
+      height:             40px;                                                         \
+      cursor:             pointer;                                                      \
+      border:             none;                                                         \
+      margin:             20px;                                                         \
+      display:            inline-block;                                                 \
+      padding:            10px 20px;                                                    \
+      font-size:          18px;                                                         \
+      text-align:         center;                                                       \
+      line-height:        20px;                                                         \
+      border-radius:      5px;                                                          \
+      text-decoration:    none;                                                         \
+      background-color:   #d32f2f;                                                    \
+    }                                                                                   \
   )rawliteral"
 #endif
 
-#ifndef WEBPAGES_NOTE_CSS
-  #define WEBPAGES_NOTE_CSS R"rawliteral(                                         \
-    .note {                                                                       \
-      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;       \
-      font-size:          14px;                                                   \
-      margin-top:         10px;                                                   \
-    }                                                                             \
-    .note h5 {                                                                    \
-      margin-bottom:      5px;                                                    \
-    }                                                                             \
-    .separator {                                                                  \
-      width:              100%;                                                   \
-      height:             1px;                                                    \
-      margin:            20px 0px;                                                \
-      background-color:  )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;        \
-    }                                                                             \
+#ifndef WEBPAGES_INPUT_SUBMIT_1_CSS
+  #define WEBPAGES_INPUT_SUBMIT_1_CSS R"rawliteral(                                     \
+    input[type="submit"] {                                                              \
+      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;               \
+      width:              180px;                                                        \
+      height:             40px;                                                         \
+      cursor:             pointer;                                                      \
+      border:             none;                                                         \
+      margin:             20px;                                                         \
+      display:            inline-block;                                                 \
+      padding:            10px 20px;                                                    \
+      font-size:          18px;                                                         \
+      text-align:         center;                                                       \
+      line-height:        20px;                                                         \
+      border-radius:      5px;                                                          \
+      text-decoration:    none;                                                         \
+      background-color:   #f09c3d;                                                    \
+    }                                                                                   \
   )rawliteral"
 #endif
 
-#ifndef WEBPAGES_BUTTON_CSS
-  #define WEBPAGES_BUTTON_CSS R"rawliteral(                                       \
-    .button {                                                                     \
-      color:              )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(;  \
-      width:              160px;                                                  \
-      height:             20px;                                                   \
-      cursor:             pointer;                                                \
-      border:             none;                                                   \
-      margin:             10px;                                                   \
-      padding:            10px 20px;                                              \
-      display:            inline-block;                                           \
-      font-size:          18px;                                                   \
-      text-align:         center;                                                 \
-      line-height:        20px;                                                   \
-      border-radius:      5px;                                                    \
-      text-decoration:    none;                                                   \
-      background-color:   )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(;       \
-    }                                                                             \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_CONTAINER_CSS
-  #define WEBPAGES_CONTAINER_CSS R"rawliteral(                                    \
-    .container {                                                                  \
-      width:              400px;                                                  \
-      height:             auto;                                                   \
-      padding:            20px;                                                   \
-      display:            flex;                                                   \
-      margin-top:         50px;                                                   \
-      background:         )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; \
-      box-shadow:         0 0 10px rgba(0, 0, 0, 0.1);                          \
-      align-items:        center;                                                 \
-      border-radius:      10px;                                                   \
-      flex-direction:     column;                                                 \
-    }                                                                             \
+#ifndef WEBPAGES_LOGS_CSS
+  #define WEBPAGES_LOGS_CSS R"rawliteral(                                               \
+    .log-screen {                                                                       \
+      border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(";\
+      width:              300px;                                                        \
+      height:             500px;                                                        \
+      overflow-y:         scroll;                                                       \
+      padding:            10px;                                                         \
+      text-align:         left;                                                         \
+      background-color: )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(";          \
+    }                                                                                   \
   )rawliteral"
 #endif
 
@@ -144,11 +106,12 @@ static const char index_html[] = R"rawliteral(
 <head>
   <title>Device Control Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    )rawliteral" (
-      WEBPAGES_BODY_CSS + WEBPAGES_CONTAINER_CSS + WEBPAGES_BUTTON_CSS + WEBPAGES_NOTE_CSS
-    ) R"rawliteral(
-  </style>
+  <style>)rawliteral" 
+    WEBPAGES_BODY_CSS  
+    WEBPAGES_NOTE_CSS
+    WEBPAGES_BUTTON_CSS  
+    WEBPAGES_CONTAINER_CSS 
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -169,89 +132,19 @@ static const char index_html[] = R"rawliteral(
 </html>
 )rawliteral";
 
-#ifdef OTADASH_DEVICE_INFO
+#if OTADASH_DEVICE_INFO
 static const char device_info_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Device Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color:  )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-    width: 400px; 
-      height: auto;
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(; 
-      color: )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 140px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    table {
-      width: 100%;
-      table-layout: fixed;
-      border-collapse: collapse;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      word-wrap: break-word;
-      word-break: break-word;
-      white-space: normal;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-      text-align: center;
-    }
-    tr {
-      height: 50px; 
-    }
-    .footer {
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-      font-size: 11px;
-      color: #666;
-    }
-    .footer a {
-      color: #00838f;
-      text-decoration: none;
-    }
-    .footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <style>)rawliteral" 
+    WEBPAGES_BODY_CSS 
+    WEBPAGES_TABLE_CSS 
+    WEBPAGES_BUTTON_CSS  
+    WEBPAGES_CONTAINER_CSS
+    WEBPAGES_HEADER_FOOTER_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -269,8 +162,9 @@ static const char device_info_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
-#endif
+#endif // OTADASH_DEVICE_INFO
 
+#if OTADASH_WIFI_MANAGER
 static const char wifi_manage_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html lang="en">
@@ -278,109 +172,13 @@ static const char wifi_manage_html[] = R"rawliteral(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WiFi Management</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-family: "Arial";
-      background-color: #e0f7fa;
-      color: #006064;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 400px;
-      height: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin: 10px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #00838f;
-      color: #ffffff;
-      text-decoration: none;
-      display: inline-block;
-      width: 140px;
-      text-align: center;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 16px;
-      color: #004d40;
-    }
-    input[type="text"], input[type="password"], button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    .wifi-list {
-      margin-top: 20px;
-      width: 100%;
-      padding: 10px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-height: 250px;
-      overflow-y: auto;
-      margin-bottom: 30px;
-    }
-    .wifi-item {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      cursor: pointer;
-    }
-    .wifi-item:last-child {
-      border-bottom: none;
-    }
-    .wifi-item:hover {
-      background-color: #f0f0f0;
-    }
-    .note {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #004d40;
-    }
-    .note h5 {
-      margin-bottom: 5px;
-    }
-    .separator {
-      width: 100%;
-      height: 1px;
-      background-color: #004d40;
-      margin: 20px 0px;
-    }
-    .button-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      width: 100%;
-    }
-  </style>
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_NOTE_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+    WEBPAGES_WIFI_ITEM_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -486,100 +284,21 @@ static const char wifi_manage_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_WIFI_SETTINGS
 
+#if OTADASH_FIRMWARE_UPDATE
 static const char update_firmware_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
   <title>Firmware Update</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-
-    input[type="file"] { 
-      padding: 10px; 
-      border: 2px dashed #00838f; 
-      border-radius: 5px; 
-      width: 200px; 
-      cursor: pointer; 
-    }
-    #progressContainer {
-      width: 100%;
-      margin-top: 20px;
-      display: none; /* Hidden initially */
-      border: 2px solid #00838f; /* Add border to make it more visible */
-      border-radius: 5px;
-      position: relative;
-    }
-    #progressBar {
-      width: 0%;
-      height: 20px;
-      background-color: #00838f;
-      border-radius: 5px;
-      transition: width 0.4s ease;
-      position: relative;
-    }
-    #progressText {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      top: 0;
-      left: 0;
-      color: #ffffff;
-      font-weight: bold;
-      line-height: 20px; /* Align text vertically */
-    }
-  </style>
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+    WEBPAGES_FIRMWARE_UPDATE_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -670,65 +389,20 @@ static const char update_firmware_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_FIRMWARE_UPDATE
 
+#if OTADASH_ERASE_SETTINGS
 static const char erase_settings_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Erase Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #d32f2f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+    WEBPAGES_INPUT_SUBMIT_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -741,65 +415,19 @@ static const char erase_settings_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_ERASE_SETTINGS
 
 static const char restart_device_html[] = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>Restart Device</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    input[type="submit"] {
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 20px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #f09c3d; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 180px; 
-      height: 40px; 
-      text-align: center;
-      line-height: 20px; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+    WEBPAGES_INPUT_SUBMIT_1_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -835,6 +463,7 @@ static const char restart_device_html[] = R"rawliteral(
 </html>
 )rawliteral";
 
+#if OTADASH_DEBUG_PAGE
 const char debug_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html lang="en">
@@ -842,52 +471,12 @@ const char debug_html[] = R"rawliteral(
   <meta charset="UTF-8">
   <title>Wireless Debug</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .log-screen {
-      border: 1px solid #ccc;
-      background-color: #fff;
-      width: 300px;
-      height: 500px;
-      overflow-y: scroll;
-      padding: 10px;
-      text-align: left; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_LOGS_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+  R"rawliteral(</style>
 </head>
 <body>
   <div class="container">
@@ -907,6 +496,7 @@ const char debug_html[] = R"rawliteral(
 </body>
 </html>
 )rawliteral";
+#endif // OTADASH_DEBUG_PAGE
 
 static const char about_html[] = R"rawliteral(
 <!DOCTYPE HTML>
@@ -914,50 +504,11 @@ static const char about_html[] = R"rawliteral(
 <head>
   <title>About OTA-Dash</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto;
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block;
-      width: 140px; 
-      height: 20px;
-      text-align: center;
-      line-height: 20px;
-    }
-    .button:hover {
-      background-color: #006064;
-      transition: 0.3s;
-    }
+  <style>)rawliteral"
+    WEBPAGES_BODY_CSS
+    WEBPAGES_BUTTON_CSS
+    WEBPAGES_CONTAINER_CSS
+  R"rawliteral(
     .content {
       text-align: left;
       margin: 20px 0;

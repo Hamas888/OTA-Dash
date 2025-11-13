@@ -207,23 +207,28 @@ void OTADash::begin(NetworkMode mode) {
 }
 
 void OTADash::printDebug(const String& message) {
-    if (serverStarted && isOnDebugPage) {                                                                           // Replace escape sequences with HTML equivalents
+    if (serverStarted) {                                                                                           
         
         String formattedMessage = message;
         formattedMessage.replace("\n", "<br/>");
         formattedMessage.replace("\r", "");
         formattedMessage.replace("\t", "&emsp;");
 
+        // Always buffer the message
         debugLogs += formattedMessage + "<br/>";
         debugLogsCounter++;
         
-        try {
-            ws->textAll(formattedMessage);                                                                          // Send the formatted message to all WebSocket clients
-        } catch (const std::exception& e) {
-            Serial.print("[OTADash]: Debug print error: ");
-            Serial.println(e.what());
+        // Send to WebSocket clients if debug page is open
+        if (isOnDebugPage) {
+            try {
+                ws->textAll(formattedMessage);                                                                          // Send the formatted message to all WebSocket clients
+            } catch (const std::exception& e) {
+                Serial.print("[OTADash]: Debug print error: ");
+                Serial.println(e.what());
+            }
         }
 
+        // Clear buffer if it gets too large
         if (debugLogsCounter >= debugLogsMax) {
             debugLogs = "";
             debugLogsCounter = 0;
@@ -293,7 +298,13 @@ void OTADash::setupServer() {
         request->send(200, "text/html", html.c_str());
     });
 
+    // Serve CSS file
+    server->on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(200, "text/css", otadash_css);
+    });
+
     server->on("/info", HTTP_GET, [this](AsyncWebServerRequest *request){
+        isOnDebugPage = false;
         String infoHtml = device_info_html;
         String deviceInfo;
         deviceInfo =  "<tr><td>Product Name</td><td>"               + productName                                       + "</td></tr>";
@@ -324,6 +335,7 @@ void OTADash::setupServer() {
     });
 
     server->on("/about", HTTP_GET, [this](AsyncWebServerRequest *request){
+        isOnDebugPage = false;
         request->send(200, "text/html", about_html);
     });
 
@@ -397,6 +409,13 @@ void OTADash::setupServer() {
         isOnDebugPage = true;
         html.replace("%PORTAL_HEADING%", portal_title);
         request->send(200, "text/html", html.c_str());
+        
+        // Send existing debug logs to the newly connected client
+        if (debugLogs.length() > 0) {
+            // Small delay to ensure WebSocket connection is established
+            delay(100);
+            ws->textAll(debugLogs);
+        }
     });
 
     server->on("/restart", HTTP_GET, [this](AsyncWebServerRequest *request){
