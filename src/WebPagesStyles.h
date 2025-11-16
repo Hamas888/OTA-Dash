@@ -1,19 +1,99 @@
-    :root {
-        --WEBPAGES_TEXT_COLOR: #212121;
-        --WEBPAGES_ACCENT_COLOR: #004d40;
-        --WEBPAGES_ACCENT_1_COLOR: #00796b;
-        --WEBPAGES_PRIMARY_COLOR: "#006064";
-        --WEBPAGES_BUTTON_COLOR: #00838f;
-        --WEBPAGES_BUTTON_TEXT_COLOR: #FFFFFF;
-        --WEBPAGES_BACKGROUND_COLOR: #FFFFFF;
-        --WEBPAGES_BACKGROUND_1_COLOR: #006064;
-        --WEBPAGES_BACKGROUND_2_COLOR: #e0f7fa;
-        --WEBPAGES_BACKGROUND_3_COLOR: #f1f1f1;
-        --WEBPAGES_BACKGROUND_4_COLOR: #fafafa;
-    }
+/*
+ ====================================================================================================
+ * File:        styles.h
+ * Author:      Hamas Saeed
+ * Version:     Rev_1.1.0
+ * Date:        Nov 13 2025
+ * Brief:       This File Contains CSS Styles For OTADash Web Pages
+ * 
+ ====================================================================================================
+ * License: 
+ * MIT License
+ * 
+ * Copyright (c) 2025 Hamas Saeed
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * For any inquiries, contact Hamas Saeed at hamasaeed@gmail.com
+ *
+ ====================================================================================================
+ */
 
+#ifndef WEBPAGES_STYLES_H
+#define WEBPAGES_STYLES_H
+
+#ifndef WEBPAGES_TEXT_COLOR
+  #define WEBPAGES_TEXT_COLOR             "#ffffff"                           // Default text color
+#endif
+
+#ifndef WEBPAGES_PRIMARY_COLOR
+  #define WEBPAGES_PRIMARY_COLOR          "#006064"                           // Default primary color
+#endif
+
+#ifndef WEBPAGES_ACCENT_COLOR
+  #define WEBPAGES_ACCENT_COLOR           "#004d40"                           // Default accent color
+#endif
+
+#ifndef WEBPAGES_ACCENT_1_COLOR
+  #define WEBPAGES_ACCENT_1_COLOR         "#00838f"                           // Default accent 1 color
+#endif
+
+#ifndef WEBPAGES_BACKGROUND_COLOR
+  #define WEBPAGES_BACKGROUND_COLOR       "#e0f7fa"                           // Default background color
+#endif
+
+#ifndef WEBPAGES_BACKGROUND_2_COLOR
+  #define WEBPAGES_BACKGROUND_2_COLOR     "#ffffff"                           // Default background 2 color
+#endif
+
+#ifndef WEBPAGES_BACKGROUND_3_COLOR
+  #define WEBPAGES_BACKGROUND_3_COLOR     "#f2f2f2"                           // Default background 3 color
+#endif
+
+#ifndef WEBPAGES_BACKGROUND_4_COLOR
+  #define WEBPAGES_BACKGROUND_4_COLOR     "#1e1e1e"                           // Default background 4 color
+#endif
+
+#ifndef WEBPAGES_BUTTON_COLOR
+  #define WEBPAGES_BUTTON_COLOR           "#00838f"                           // Default button background color
+#endif
+
+#ifndef WEBPAGES_BUTTON_TEXT_COLOR
+  #define WEBPAGES_BUTTON_TEXT_COLOR      "#ffffff"                           // Default button text color
+#endif
+
+
+#ifndef WEBPAGES_BORDER_COLOR
+  #define WEBPAGES_BORDER_COLOR           "#ddd"                              // Default border color
+#endif
+
+#ifndef WEBPAGES_HEADER_FOOTER_COLOR
+  #define WEBPAGES_HEADER_FOOTER_COLOR    "#666"                              // Default header/footer color
+#endif
+
+#ifndef WEBPAGES_LINK_COLOR
+  #define WEBPAGES_LINK_COLOR             "#00838f"                           // Default link color
+#endif
+
+static const char otadash_css[] = R"rawliteral(
     body {
-      color:              var(--WEBPAGES_PRIMARY_COLOR);
+      color:              )rawliteral" WEBPAGES_PRIMARY_COLOR R"rawliteral(;
       margin:             0;
       padding:            0;
       display:            flex;
@@ -21,7 +101,7 @@
       font-family:        "Arial";
       align-items:        center;
       justify-content:    center;
-      background-color:   var(--WEBPAGES_BACKGROUND_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(;
     }
 
     .container {
@@ -32,7 +112,7 @@
       padding:            20px;
       display:            flex;
       margin-top:         50px;
-      background:         var(--WEBPAGES_BACKGROUND_2_COLOR);
+      background:         )rawliteral" WEBPAGES_BACKGROUND_2_COLOR R"rawliteral(;
       box-shadow:         0 0 10px rgba(0, 0, 0, 0.1);
       align-items:        center;
       border-radius:      10px;
@@ -40,7 +120,7 @@
     }
 
     .button {
-      color:              var(--WEBPAGES_BUTTON_TEXT_COLOR);
+      color:              )rawliteral" WEBPAGES_BUTTON_TEXT_COLOR R"rawliteral(;
       min-width:          160px;
       width:              auto;
       height:             auto;
@@ -53,7 +133,7 @@
       text-align:         center;
       border-radius:      5px;
       text-decoration:    none;
-      background-color:   var(--WEBPAGES_BUTTON_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BUTTON_COLOR R"rawliteral(;
       box-sizing:         border-box;
     }
 
@@ -67,7 +147,7 @@
     }
 
     .note {
-      color:              var(--WEBPAGES_ACCENT_COLOR);
+      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;
       font-size:          14px;
       margin-top:         10px;
     }
@@ -80,19 +160,19 @@
       width:              100%;
       height:             1px;
       margin:             20px 0px;
-      background-color:   var(--WEBPAGES_ACCENT_COLOR);
+      background-color:   )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;
     }
 
     .footer {
-      color:              var(--WEBPAGES_HEADER_FOOTER_COLOR);
+      color:              )rawliteral" WEBPAGES_HEADER_FOOTER_COLOR R"rawliteral(;
       font-size:          11px;
       margin-top:         20px;
-      border-top:         1px solid var(--WEBPAGES_BORDER_COLOR);
+      border-top:         1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(;
       padding-top:        15px;
     }
 
     .footer a {
-      color:              var(--WEBPAGES_LINK_COLOR);
+      color:              )rawliteral" WEBPAGES_LINK_COLOR R"rawliteral(;
       text-decoration:    none;
     }
 
@@ -114,17 +194,17 @@
 
     .header h1 {
       margin:             0;
-      color:              var(--WEBPAGES_ACCENT_COLOR);
+      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;
     }
       
     .header p {
       margin:             5px 0;
       font-size:          12px;
-      color:              var(--WEBPAGES_HEADER_FOOTER_COLOR);
+      color:              )rawliteral" WEBPAGES_HEADER_FOOTER_COLOR R"rawliteral(;
     }
 
     .credits {
-      background-color:   var(--WEBPAGES_BACKGROUND_3_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_3_COLOR R"rawliteral(;
       padding:            15px;
       border-radius:      5px;
       margin:             15px 0;
@@ -132,7 +212,7 @@
 
     .credits h3 {
       margin-top:         0;
-      color:              var(--WEBPAGES_ACCENT_COLOR);
+      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;
       font-size:          14px;
     }
 
@@ -142,7 +222,7 @@
     }
 
     .credits a {
-      color:              var(--WEBPAGES_LINK_COLOR);
+      color:              )rawliteral" WEBPAGES_LINK_COLOR R"rawliteral(;
       text-decoration:    none;
     }
 
@@ -158,7 +238,7 @@
     }
 
     th, td {
-      border:             1px solid var(--WEBPAGES_BORDER_COLOR);   
+      border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(;   
       padding:            10px;                                                         
       word-wrap:          break-word;
       word-break:         break-word;
@@ -168,7 +248,7 @@
 
     th {
       text-align:         center;
-      background-color:   var(--WEBPAGES_BACKGROUND_3_COLOR);      
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_3_COLOR R"rawliteral(;      
     }
 
     tr {
@@ -184,20 +264,20 @@
       box-shadow:         0 2px 4px rgba(0, 0, 0, 0.1);
       margin-bottom:      30px;
       border-radius:      8px;
-      background-color:   var(--WEBPAGES_BACKGROUND_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(;
     }
 
     .wifi-item {
       cursor:             pointer;
       padding:            10px;
-      border-bottom:      1px solid var(--WEBPAGES_BORDER_COLOR);
+      border-bottom:      1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(;
     }
 
     .wifi-item:last-child {
       border-bottom:      none;
     }
     .wifi-item:hover {
-      background-color:   var(--WEBPAGES_BACKGROUND_3_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_3_COLOR R"rawliteral(;
     }
 
     h1 {
@@ -213,7 +293,7 @@
     }
       
     label {
-      color:              var(--WEBPAGES_ACCENT_COLOR);
+      color:              )rawliteral" WEBPAGES_ACCENT_COLOR R"rawliteral(;
       display:            block;
       font-size:          16px;
       text-align:         left;
@@ -222,7 +302,7 @@
 
     input[type="text"], input[type="password"] {
       width:              100%;
-      border:             1px solid var(--WEBPAGES_BORDER_COLOR);
+      border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(;
       padding:            8px;
       box-sizing:         border-box;
       border-radius:      4px;
@@ -236,8 +316,8 @@
       padding:            12px 20px;
       font-size:          16px;
       border-radius:      5px;
-      background-color:   var(--WEBPAGES_ACCENT_1_COLOR);
-      color:              var(--WEBPAGES_TEXT_COLOR);
+      background-color:   )rawliteral" WEBPAGES_ACCENT_1_COLOR R"rawliteral(;
+      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;
       text-decoration:    none;
       display:            inline-block;
       min-width:          140px;
@@ -249,7 +329,7 @@
 
     input[type="file"] {
       padding:            10px;
-      border:             2px dashed var(--WEBPAGES_ACCENT_1_COLOR);
+      border:             2px dashed )rawliteral" WEBPAGES_ACCENT_1_COLOR R"rawliteral(;
       border-radius:      5px;
       width:              200px;
       cursor:             pointer;
@@ -257,7 +337,7 @@
 
     #progressContainer {
       width:              100%;
-      border:             2px solid var(--WEBPAGES_ACCENT_1_COLOR);
+      border:             2px solid )rawliteral" WEBPAGES_ACCENT_1_COLOR R"rawliteral(;
       display:            none;
       position:           relative;
       margin-top:         20px;
@@ -270,11 +350,11 @@
       position:           relative;
       transition:         width 0.4s ease;
       border-radius:      5px;
-      background-color:   var(--WEBPAGES_ACCENT_1_COLOR);
+      background-color:   )rawliteral" WEBPAGES_ACCENT_1_COLOR R"rawliteral(;
     }
 
     #progressText {
-      color:              var(--WEBPAGES_TEXT_COLOR);
+      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;
       top:                0;
       left:               0;
       width:              100%;
@@ -285,15 +365,14 @@
     }
 
     .log-screen {
-      border:             1px solid var(--WEBPAGES_BORDER_COLOR);
-      width:              100%;
-      max-width:          400px;
+      border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(";
+      width:              400px;
       height:             400px;
       overflow-y:         scroll;
       padding:            10px;
       text-align:         left;
-      background-color:   var(--WEBPAGES_BACKGROUND_4_COLOR);
-      color:              var(--WEBPAGES_TEXT_COLOR);
+      background-color:   )rawliteral" WEBPAGES_BACKGROUND_4_COLOR R"rawliteral(;
+      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;
       box-sizing:         border-box;
       font-family:        monospace;
       font-size:          12px;
@@ -316,32 +395,7 @@
     .restart-submit:hover {
       background-color:   #e68900 !important;
     }
-
-    .logo {
-      max-width: 350px;
-      max-height: 116px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: -webkit-crisp-edges;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-      image-rendering: pixelated;
-      background: transparent;
-
-      -ms-interpolation-mode: nearest-neighbor;
-
-      width: auto;
-      height: auto;
-    }
     
-    .logo:hover {
-      transform: scale(1.05);
-      transition: transform 0.3s ease;
-    }
-
     @media (max-width: 480px) {
       .container {
         width: 95%;
@@ -350,22 +404,22 @@
       }
       
       .button {
-        min-width: 120px;
+        min-width: 160px;
         font-size: 14px;
         padding: 10px 15px;
         margin: 8px 3px;
       }
       
       input[type="submit"] {
-        min-width: 120px;
+        min-width: 160px;
         font-size: 14px;
         padding: 10px 15px;
       }
       
       .log-screen {
         height:             300px;
-        background-color:   var(--WEBPAGES_BACKGROUND_4_COLOR);
-        color:              var(--WEBPAGES_TEXT_COLOR);
+        background-color:   )rawliteral" WEBPAGES_BACKGROUND_4_COLOR R"rawliteral(;
+        color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;
         word-wrap:          break-word;
         white-space:        pre-wrap;
       }
@@ -374,3 +428,6 @@
         font-size: 20px;
       }
     }
+)rawliteral";
+
+#endif // WEBPAGES_STYLES_H

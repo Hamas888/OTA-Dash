@@ -1,9 +1,9 @@
-   /*
+/*
  ====================================================================================================
  * File:        WebPages.h
  * Author:      Hamas Saeed
- * Version:     Rev_1.0.0
- * Date:        Feb 10 2025
+ * Version:     Rev_1.1.0
+ * Date:        Nov 13 2025
  * Brief:       This File Contains HTML Templates For Web Pages Used In OTADash
  * 
  ====================================================================================================
@@ -44,88 +44,32 @@
 #define OTADASH_ERASE_SETTINGS            1
 #define OTADASH_DEBUG_PAGE                1
 
-#ifndef WEBPAGES_INPUT_SUBMIT_CSS
-  #define WEBPAGES_INPUT_SUBMIT_CSS R"rawliteral(                                       \
-    input[type="submit"] {                                                              \
-      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;               \
-      width:              180px;                                                        \
-      height:             40px;                                                         \
-      cursor:             pointer;                                                      \
-      border:             none;                                                         \
-      margin:             20px;                                                         \
-      display:            inline-block;                                                 \
-      padding:            10px 20px;                                                    \
-      font-size:          18px;                                                         \
-      text-align:         center;                                                       \
-      line-height:        20px;                                                         \
-      border-radius:      5px;                                                          \
-      text-decoration:    none;                                                         \
-      background-color:   #d32f2f;                                                    \
-    }                                                                                   \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_INPUT_SUBMIT_1_CSS
-  #define WEBPAGES_INPUT_SUBMIT_1_CSS R"rawliteral(                                     \
-    input[type="submit"] {                                                              \
-      color:              )rawliteral" WEBPAGES_TEXT_COLOR R"rawliteral(;               \
-      width:              180px;                                                        \
-      height:             40px;                                                         \
-      cursor:             pointer;                                                      \
-      border:             none;                                                         \
-      margin:             20px;                                                         \
-      display:            inline-block;                                                 \
-      padding:            10px 20px;                                                    \
-      font-size:          18px;                                                         \
-      text-align:         center;                                                       \
-      line-height:        20px;                                                         \
-      border-radius:      5px;                                                          \
-      text-decoration:    none;                                                         \
-      background-color:   #f09c3d;                                                    \
-    }                                                                                   \
-  )rawliteral"
-#endif
-
-#ifndef WEBPAGES_LOGS_CSS
-  #define WEBPAGES_LOGS_CSS R"rawliteral(                                               \
-    .log-screen {                                                                       \
-      border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(";\
-      width:              300px;                                                        \
-      height:             500px;                                                        \
-      overflow-y:         scroll;                                                       \
-      padding:            10px;                                                         \
-      text-align:         left;                                                         \
-      background-color: )rawliteral" WEBPAGES_BACKGROUND_COLOR R"rawliteral(";          \
-    }                                                                                   \
-  )rawliteral"
-#endif
-
 static const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
   <title>Device Control Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral" 
-    WEBPAGES_BODY_CSS  
-    WEBPAGES_NOTE_CSS
-    WEBPAGES_BUTTON_CSS  
-    WEBPAGES_CONTAINER_CSS 
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <h1>%PORTAL_HEADING%</h1>
+    %CUSTOM_CONTENT%
     <a href="/info" class="button">Device Info</a>
     <a href="/wifimanage" class="button">Manage WIFI</a>
     <a href="/debug" class="button">Wireless Debug</a>
     <a href="/update" class="button">Update Firmware</a>
     <a href="/erase" class="button">Erase Settings</a>
     <a href="/restart" class="button">Restart Device</a>
+    <a href="/about" class="button">About</a>
     <div class="separator"></div> 
     <div class="note">
       <h5>Note</h5>
       If the update function isn't working, open the portal in your browser: <a href="http://%CUSTOM_DOMAIN%">%CUSTOM_DOMAIN%</a>
+    </div>
+    <div class="footer">
+      Developed by <a href="https://github.com/Hamas888" target="_blank">Hamas Saeed</a>
     </div>
   </div>
 </body>
@@ -138,13 +82,7 @@ static const char device_info_html[] = R"rawliteral(
 <head>
   <title>Device Info</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral" 
-    WEBPAGES_BODY_CSS 
-    WEBPAGES_TABLE_CSS 
-    WEBPAGES_BUTTON_CSS  
-    WEBPAGES_CONTAINER_CSS
-    WEBPAGES_HEADER_FOOTER_CSS
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -154,10 +92,6 @@ static const char device_info_html[] = R"rawliteral(
       %DEVICE_INFO%
     </table>
     <a href="/" class="button">Back</a>
-    <a href="/about" class="button">About</a>
-    <div class="footer">
-      Developed by <a href="https://github.com/Hamas888" target="_blank">Hamas Saeed</a>
-    </div>
   </div>
 </body>
 </html>
@@ -172,13 +106,7 @@ static const char wifi_manage_html[] = R"rawliteral(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WiFi Management</title>
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_NOTE_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-    WEBPAGES_WIFI_ITEM_CSS
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -293,12 +221,7 @@ static const char update_firmware_html[] = R"rawliteral(
 <head>
   <title>Firmware Update</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-    WEBPAGES_FIRMWARE_UPDATE_CSS
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -397,18 +320,13 @@ static const char erase_settings_html[] = R"rawliteral(
 <head>
   <title>Erase Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-    WEBPAGES_INPUT_SUBMIT_CSS
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <h1>Erase Settings</h1>
     <form method="POST" action="/erase">
-      <input type="submit" value="Erase Settings" class="button">
+      <input type="submit" value="Erase Settings" class="button erase-submit">
     </form>
     <a href="/" class="button">Back</a>
   </div>
@@ -422,18 +340,13 @@ static const char restart_device_html[] = R"rawliteral(
 <head>
   <title>Restart Device</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-    WEBPAGES_INPUT_SUBMIT_1_CSS
-  R"rawliteral(</style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <h1>Restart Device</h1>
     <form id="restartForm">
-      <input type="button" value="Restart Device" class="button" onclick="submitRestart()">
+      <input type="button" value="Restart Device" class="button restart-submit" onclick="submitRestart()">
     </form>
     <a href="/" class="button">Back</a>
     
@@ -465,33 +378,76 @@ static const char restart_device_html[] = R"rawliteral(
 
 #if OTADASH_DEBUG_PAGE
 const char debug_html[] = R"rawliteral(
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Wireless Debug</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_LOGS_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-  R"rawliteral(</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
   <div class="container">
     <h1>%PORTAL_HEADING% Debug Logs</h1>
+
     <div class="log-screen" id="logs">
+      <span style="color: #888888;">[Debug Console Ready - Waiting for messages...]</span><br />
     </div>
-    <a href="/" class="button">Back</a>
+
+    <div style="margin-top: 10px;">
+      <button onclick="clearLogs()" class="button" style="margin-right: 10px;">Clear Logs</button>
+      <a href="/" class="button">Back</a>
+    </div>
   </div>
+
   <script>
-    var ws = new WebSocket(`ws://${window.location.hostname}/ws`);
-    ws.onmessage = function(event) {
-      var logsDiv = document.getElementById('logs');
-      logsDiv.innerHTML += event.data + "<br/>";
-      logsDiv.scrollTop = logsDiv.scrollHeight; // Auto-scroll to the bottom
-    };
+    let ws;
+    const reconnectInterval = 5000;
+
+    function connectWebSocket() {
+      try {
+        ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+        ws.onopen = () => {
+          console.log("WebSocket connected");
+          appendLog("[WebSocket Connected]", "#00ff00");
+        };
+
+        ws.onmessage = (event) => {
+          const logsDiv = document.getElementById("logs");
+          logsDiv.innerHTML += event.data + "<br/>";
+          logsDiv.scrollTop = logsDiv.scrollHeight;
+        };
+
+        ws.onclose = () => {
+          console.log("WebSocket disconnected");
+          appendLog("[WebSocket Disconnected - Reconnecting...]", "#ff0000");
+          setTimeout(connectWebSocket, reconnectInterval);
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          appendLog("[WebSocket Error]", "#ff0000");
+        };
+      } catch (e) {
+        console.error("Failed to create WebSocket:", e);
+        appendLog("[Failed to connect WebSocket]", "#ff0000");
+        setTimeout(connectWebSocket, reconnectInterval);
+      }
+    }
+
+    function appendLog(message, color) {
+      const logsDiv = document.getElementById("logs");
+      logsDiv.innerHTML += `<span style="color: ${color};">${message}</span><br/>`;
+    }
+
+    function clearLogs() {
+      document.getElementById("logs").innerHTML =
+        '<span style="color: #888888;">[Debug Console Cleared]</span><br/>';
+    }
+
+    connectWebSocket();
   </script>
 </body>
 </html>
@@ -504,59 +460,7 @@ static const char about_html[] = R"rawliteral(
 <head>
   <title>About OTA-Dash</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>)rawliteral"
-    WEBPAGES_BODY_CSS
-    WEBPAGES_BUTTON_CSS
-    WEBPAGES_CONTAINER_CSS
-  R"rawliteral(
-    .content {
-      text-align: left;
-      margin: 20px 0;
-      font-size: 14px;
-      line-height: 1.8;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      margin: 0;
-      color: #00838f;
-    }
-    .header p {
-      margin: 5px 0;
-      font-size: 12px;
-      color: #666;
-    }
-    .credits {
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 15px 0;
-    }
-    .credits h3 {
-      margin-top: 0;
-      color: #004d40;
-      font-size: 14px;
-    }
-    .credits p {
-      margin: 8px 0;
-      font-size: 13px;
-    }
-    .credits a {
-      color: #00838f;
-      text-decoration: none;
-    }
-    .credits a:hover {
-      text-decoration: underline;
-    }
-    .separator {
-      width: 100%; 
-      height: 1px;
-      background-color: #ddd; 
-      margin: 15px 0;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
@@ -591,10 +495,7 @@ static const char about_html[] = R"rawliteral(
       <p>MIT License - Free for personal and commercial use</p>
     </div>
 
-    <div class="separator"></div>
-
     <a href="/" class="button">Home</a>
-    <a href="/info" class="button">Device Info</a>
   </div>
 </body>
 </html>

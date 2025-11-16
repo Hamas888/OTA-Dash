@@ -2,8 +2,8 @@
  ====================================================================================================
  * File:        OTADash.h
  * Author:      Hamas Saeed
- * Version:     Rev_1.0.0
- * Date:        Feb 10 2025
+ * Version:     Rev_1.1.0
+ * Date:        Nov 13 2025
  * Brief:       This Package Provide Wireless Intrective Features For IoT Devices Based On ESP32
  * 
  ====================================================================================================
@@ -42,11 +42,53 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <Update.h>
+#include <vector>
 #include <DNSServer.h>
 #include <EEPROM.h>
 #include <ESPmDNS.h>
-#include "WebPages.h"
+#include <functional>
 #include "ArduinoJson.h"
+
+#define OTA_DASH_VERSION "1.1.0"
+
+#ifndef OTADASH_DEBUG_ENABLED
+    #define OTADASH_DEBUG_ENABLED 1
+#endif
+
+#if OTADASH_DEBUG_ENABLED
+    #if __has_include("ChronoLog.h")
+        #include "ChronoLog.h"
+        #define OTADASH_DEBUG_LEVEL CHRONOLOG_LEVEL_DEBUG
+        extern ChronoLogger *otaDashLogger;
+    #else
+        #error "OTADash Debugging Enabled But ChronoLog Library Not Found. Please Install ChronoLog or Disable OTADASH_DEBUG"
+    #endif
+#endif
+
+#if OTADASH_DEBUG_ENABLED
+    #define OTADASH_LOGGER(level, msg, ...)     \
+        do {                                    \
+            if (otaDashLogger)                  \
+                otaDashLogger->level(           \
+                    msg, ##__VA_ARGS__          \
+                );                              \
+        } while (0);  
+#else
+    #define OTADASH_LOGGER(level, msg, ...) do {} while (0)
+#endif
+
+
+#ifndef OTA_DASH_TASK_CORE
+    #define OTA_DASH_TASK_CORE 1
+#endif
+
+#ifndef OTA_DASH_TASK_PRIORITY
+    #define OTA_DASH_TASK_PRIORITY 5
+#endif
+
+#ifndef OTA_DASH_TASK_STACK_SIZE
+    #define OTA_DASH_TASK_STACK_SIZE 4096
+#endif
 
 enum NetworkMode {
     ACCESS_POINT,
@@ -59,6 +101,19 @@ struct NetworkCredentials {
     char ssid[20];
     char password[20];
     char setuped[10];
+};
+
+struct CustomPage {
+    String path;
+    String htmlContent;
+    std::function<String(const String&)> getCallback;
+    std::function<String(const String&)> postCallback;
+    
+    CustomPage(
+        const String& p, const String& html, 
+        std::function<String(const String&)> get = nullptr,
+        std::function<String(const String&)> post = nullptr
+    ) : path(p), htmlContent(html), getCallback(get), postCallback(post) {}
 };
 
 class OTADash {
@@ -77,6 +132,18 @@ public:
     
     void onPaired(std::function<void(JsonDocument&)> callback);
     void onWifiSaved(std::function<void(const String&, const String&)> callback);
+    
+    void addCustomPage(
+        const String& path, const String& htmlContent, 
+        std::function<String(const String&)> getCallback = nullptr,
+        std::function<String(const String&)> postCallback = nullptr
+    );
+
+    void addCustomDataHandler(
+        const String& path,
+        std::function<String(const String&)> getCallback = nullptr,
+        std::function<String(const String&)> postCallback = nullptr
+    );
     
     void setDebugLogMax(int logs)           { debugLogsMax          = logs;    }
     void setEEPROMSize(size_t size)         { eepromSize            = size;    }
@@ -107,6 +174,8 @@ private:
     int                                                 debugLogsCounter        = 0;
     int                                                 debugLogsMax            = 200;
     int                                                 maxReconnectAttempts    = 3;
+    int                                                 cachedScanCount         = -1;
+    int                                                 visibleNetworksCount    = -1;
     bool                                                isWifiConnected         = false;
     bool                                                serverStarted           = false;
     bool                                                isOnDebugPage           = false;
@@ -114,11 +183,13 @@ private:
     bool                                                pairRequest             = false;
     bool                                                pairResult              = false;
     bool                                                mdnsStarted             = false;
+    bool                                                scanWiFi                = false;
     size_t                                              eepromSize              = 50; 
     String                                              debugLogs;
     String                                              customDomain;
     String                                              firmwareVersion         = "Not Configured";
     String                                              productName             = "ESP32 Device";
+    String                                              cachedScanResults;
     uint32_t                                            reconnectDelay          = 5000;   
     const char*                                         ssid;
     const char*                                         password;
@@ -132,6 +203,7 @@ private:
     std::unique_ptr<AsyncWebSocket>                     ws;
     std::function<void(JsonDocument&)>                  pairingCallback;                                                  // User-defined callback
     std::function<void(const String&, const String&)>   wifiSavedCallback;                                                // User-defined callback
+    std::vector<CustomPage>                             customPages;                                                      // Store custom pages
 
     void stop();
     bool readEEPROM();
@@ -147,11 +219,17 @@ private:
     void handleNetworkFailure();
     static void otaDashTask(void *parameter);
     void handleWifiScanResult(int scanResult); 
+    void publishCachedScanResults();
     String encryptionTypeToString(int encryptionType); 
     static void handleUpdate(AsyncWebServerRequest *request);
     void handleWebSocketMessage(void *arg, uint8_t *data, size_t len);
     bool connectToWifi(const char* ssid, const char* password, uint32_t timeout_ms = 20000);
     static void handleUpload(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
+    
+    void setupCustomPageRoutes();
+    String queryParamsToJson(AsyncWebServerRequest *request);
+    void handleCustomPageGet(AsyncWebServerRequest *request, const CustomPage& page);
+    void handleCustomDataGet(AsyncWebServerRequest *request, const CustomPage& page);
 };
 
 #endif // OTASERVER_H

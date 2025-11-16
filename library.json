@@ -1,6 +1,6 @@
 {
   "name": "OTA-Dash",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A plug-and-play OTA and configuration dashboard for ESP32-S3 devices using a web interface.",
   "keywords": [
     "esp32",

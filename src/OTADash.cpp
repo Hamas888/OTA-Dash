@@ -36,6 +36,12 @@
  */
 
 #include "OTADash.h"
+#include "WebPages.h"
+#include "WebPagesStyles.h"
+
+#if OTADASH_DEBUG_ENABLED
+   ChronoLogger *otaDashLogger = nullptr;
+#endif
 
 OTADash* OTADash::instance = nullptr;
 
@@ -50,15 +56,18 @@ OTADash::OTADash(const char* ssid, const char* password, const char* custom_doma
     server          (std::make_unique<AsyncWebServer>(80)),
     ws              (std::make_unique<AsyncWebSocket>("/ws")) {
     instance = this;
+
+    #if OTADASH_DEBUG_ENABLED
+        otaDashLogger = new ChronoLogger("OTADash", OTADASH_DEBUG_LEVEL);
+    #endif
+    OTADASH_LOGGER(debug, "OTADash Instance Created");
 }
 
 OTADash::~OTADash() {
-    try {
-        stop();
-    } catch (const std::exception& e) {                                                                             // Handle any exceptions that occur during server shutdown
-        Serial.print("[OTADash]: Error during server shutdown: ");
-        Serial.println(e.what());
-    }
+    stop();
+    OTADASH_LOGGER(debug, "OTADash Instance Destroyed");
+    delete otaDashLogger;
+    otaDashLogger = nullptr;
 }
 
 void OTADash::stop() {
@@ -72,7 +81,8 @@ void OTADash::stop() {
         }
         WiFi.softAPdisconnect(true);
         serverStarted = false;
-        Serial.println("Server stopped");
+        OTADASH_LOGGER(info, "Server stopped");
+        
     }
 }
 
@@ -98,61 +108,73 @@ bool OTADash::writeEEPROM() {
 }
 
 void OTADash::handleClient() {
-    if (currentMode == NetworkMode::ACCESS_POINT || currentMode == NetworkMode::DUAL) {
-        dnsServer->processNextRequest();
-    }
-    
-    if ((currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) 
-        && WiFi.status() != WL_CONNECTED && autoReconnect) {
-        handleNetworkFailure();
-    }
-    
-    int scanResult = WiFi.scanComplete();
-    if (scanResult >= 0) {
-        handleWifiScanResult(scanResult);
-    }
+    if(serverStarted) {
+        if (currentMode == NetworkMode::ACCESS_POINT || currentMode == NetworkMode::DUAL) {
+            dnsServer->processNextRequest();
+        }
+        
+        if ((currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) 
+            && WiFi.status() != WL_CONNECTED && autoReconnect) {
+            handleNetworkFailure();
+        }
 
-    if(pairRequest) {
-        handlePairingResult();
+        if(pairRequest) {
+            handlePairingResult();
+        }
+    }
+    
+    if(scanWiFi) {
+        int scanComplete = WiFi.scanComplete();
+        if(scanComplete >= 0) {
+            handleWifiScanResult(scanComplete);
+            visibleNetworksCount = scanComplete;
+        }
+    }
+}
+
+void OTADash::disconnectWifi() {
+    if (currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) {
+        WiFi.disconnect();
     }
 }
 
 void OTADash::begin(NetworkMode mode) {
     currentMode = mode;
     server->reset();
-    Serial.println("[OTADash]: Starting server....");
+    
+    OTADASH_LOGGER(info, "Starting server....");
 
     if(mode == NetworkMode::STATION || mode == NetworkMode::AUTO || mode == NetworkMode::DUAL) {
         if(!readEEPROM()) {
-            Serial.println("[OTADash]: Wifi credentials not found. Mode set to ACCESS_POINT");
-            currentMode = NetworkMode::ACCESS_POINT;                                                                // Default to Access Point mode if no credentials are found
+            OTADASH_LOGGER(warn, "WiFi credentials not found in EEPROM. Switching to AP mode.");
+            currentMode = NetworkMode::ACCESS_POINT;                                                                    // Default to Access Point mode if no credentials are found
         } else if(mode == NetworkMode::AUTO) {
-            Serial.println("[OTADash]: Auto mode detected. Switching to STATION mode");
-            currentMode = NetworkMode::STATION;                                                                     // Switch to Station mode if AUTO is selected
+            OTADASH_LOGGER(info, "Auto mode detected. Switching to STATION mode");
+            currentMode = NetworkMode::STATION;                                                                         // Switch to Station mode if AUTO is selected
         }
     }
   
     switch (currentMode) {
         case NetworkMode::ACCESS_POINT:
-            Serial.println("[OTADash]: Access Point mode");
+            OTADASH_LOGGER(info, "Access Point mode");            
             if (!startAccessPoint()) {
-                Serial.println("[OTADash]: Failed to start AP mode");
+                OTADASH_LOGGER(error, "Failed to start AP mode");
                 return;
             }
             break;
             
         case NetworkMode::STATION:
-            Serial.println("[OTADash]: Station mode");
+            OTADASH_LOGGER(info, "Station mode");
             if (!startStation()) {
-                Serial.println("[OTADash]: Failed to start STA mode");
+                OTADASH_LOGGER(error, "Failed to start STA mode");
                 return;
             }
             break;
 
         case NetworkMode::DUAL:
-            Serial.println("[OTADash]: Dual AP/STA mode");
+            OTADASH_LOGGER(info, "Dual AP/STA mode");
             if(!startDualMode()) {
-                Serial.println("[OTADash]: Failed to start Dual mode");
+                OTADASH_LOGGER(error, "Failed to start Dual mode");
                 return;
             }
             break;
@@ -169,37 +191,35 @@ void OTADash::begin(NetworkMode mode) {
         void *arg, 
         uint8_t *data, 
         size_t len) {
-        try {
-            if (type == WS_EVT_DATA) {
-                AwsFrameInfo *info = (AwsFrameInfo *)arg;
-                if (info->opcode == WS_TEXT) {
-                    data[len] = 0;
-                    handleWebSocketMessage(arg, data, len);
-                }
+
+        if (type == WS_EVT_DATA) {
+            AwsFrameInfo *info = (AwsFrameInfo *)arg;
+            if (info->opcode == WS_TEXT) {
+                data[len] = 0;
+                handleWebSocketMessage(arg, data, len);
             }
-        } catch (const std::exception &e) {
-            Serial.print("[OTADash]: WebSocket error: ");
-            Serial.println(e.what());
+        } else if (type == WS_EVT_CONNECT) {
+            OTADASH_LOGGER(info, "WebSocket client connected: ID=%u", client->id());
+        } else if (type == WS_EVT_DISCONNECT) {
+            OTADASH_LOGGER(info, "WebSocket client disconnected: ID=%u", client->id());
         }
     });
 
     server->addHandler(ws.get());
     setupServer();
     server->begin();
-    Serial.println("[OTADash]: Server started");
+    OTADASH_LOGGER(info, "Server started");
 
     if (currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) {
-        Serial.print("[OTADash]: Station IP: ");
-        Serial.println(WiFi.localIP());
-        Serial.println("[OTADash]: Access in the browser by: http://" + WiFi.localIP().toString());
-        Serial.println("[OTADash]: Waiting for mDNS initialization...");
-        Serial.println("[OTADash]: Once ready, access via: http://" + customDomain);
+        OTADASH_LOGGER(info, "Station IP: %s", WiFi.localIP().toString().c_str());
+        OTADASH_LOGGER(info, "Access in the browser by: http://%s", WiFi.localIP().toString().c_str());
+        OTADASH_LOGGER(info, "Waiting for mDNS initialization...");
+        OTADASH_LOGGER(info, "Once ready, access via: http://%s", customDomain.c_str());
     }
     if (currentMode == NetworkMode::ACCESS_POINT || currentMode == NetworkMode::DUAL) {
-        Serial.print("[OTADash]: Access point IP: ");
-        Serial.println(WiFi.softAPIP());
-        Serial.println("[OTADash]: Access in the browser by: http://" + WiFi.softAPIP().toString());
-        Serial.println("[OTADash]: Access in the browser by: http://" + customDomain);
+        OTADASH_LOGGER(info, "Access point IP: %s", WiFi.softAPIP().toString().c_str());
+        OTADASH_LOGGER(info, "Access in the browser by: http://%s", WiFi.softAPIP().toString().c_str());
+        OTADASH_LOGGER(info, "Access in the browser by: http://%s", customDomain.c_str());
     }
     serverStarted = true;
 
@@ -207,7 +227,7 @@ void OTADash::begin(NetworkMode mode) {
 }
 
 void OTADash::printDebug(const String& message) {
-    if (serverStarted && isOnDebugPage) {                                                                           // Replace escape sequences with HTML equivalents
+    if (serverStarted) {                                                                                           
         
         String formattedMessage = message;
         formattedMessage.replace("\n", "<br/>");
@@ -217,21 +237,18 @@ void OTADash::printDebug(const String& message) {
         debugLogs += formattedMessage + "<br/>";
         debugLogsCounter++;
         
-        try {
-            ws->textAll(formattedMessage);                                                                          // Send the formatted message to all WebSocket clients
-        } catch (const std::exception& e) {
-            Serial.print("[OTADash]: Debug print error: ");
-            Serial.println(e.what());
+        if (isOnDebugPage) {                                                                                            // Send to WebSocket clients if debug page is open
+            ws->textAll(formattedMessage);                                                                              // Send the formatted message to all WebSocket clients
         }
 
-        if (debugLogsCounter >= debugLogsMax) {
+        if (debugLogsCounter >= debugLogsMax) {                                                                         // Clear buffer if it gets too large
             debugLogs = "";
             debugLogsCounter = 0;
         }
     }
 }
 
-String OTADash::encryptionTypeToString(int encryptionType) {                                                                                              // Helper function to convert encryption type to a string
+String OTADash::encryptionTypeToString(int encryptionType) {                                                            // Helper function to convert encryption type to a string
     switch (encryptionType) {
         case WIFI_AUTH_OPEN: return "Open";
         case WIFI_AUTH_WEP: return "WEP";
@@ -243,32 +260,27 @@ String OTADash::encryptionTypeToString(int encryptionType) {                    
     }
 }
 
-void OTADash::disconnectWifi() {
-    if (currentMode == NetworkMode::STATION || currentMode == NetworkMode::DUAL) {
-        WiFi.disconnect();
-    }
-}
-
 bool OTADash::connectToWifi(const char* ssid, const char* password, uint32_t timeout_ms) {
     if (currentMode == NetworkMode::ACCESS_POINT) {
-        Serial.println("[OTADash]: Cannot connect to WiFi in AP-only mode");
+        OTADASH_LOGGER(info, "Cannot connect to WiFi in AP-only mode");
+        
         return false;
     }
 
     WiFi.begin(ssid, password);
     
     uint32_t startTime = millis();
-    Serial.print("[OTADash]: Connecting to WiFi ");
+    OTADASH_LOGGER(info, "Connecting to WiFi %s", ssid);
     while (WiFi.status() != WL_CONNECTED) {
         if (millis() - startTime >= timeout_ms) {
-            Serial.println("[OTADash]: WiFi connection timeout");
+            OTADASH_LOGGER(info, "WiFi connection timeout");
             return false;
         }
-        delay(500);
-        Serial.print(".");
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        OTADASH_LOGGER(debug, "Trying to connect...");
     }
     
-    Serial.println("\n[OTADash]: Connected to WiFi");
+    OTADASH_LOGGER(info, "Connected to WiFi");
     return true;
 }
 
@@ -290,15 +302,41 @@ void OTADash::setupServer() {
         String html = index_html;
         html.replace("%PORTAL_HEADING%", portal_title);
         html.replace("%CUSTOM_DOMAIN%", customDomain);
+        if(customPages.size() > 0) {
+            String rawName = customPages[0].path;
+
+            if (rawName.startsWith("/")) {
+                rawName = rawName.substring(1);
+            }
+
+            if (rawName.length() > 0) {
+                rawName.setCharAt(0, toupper(rawName.charAt(0)));
+            }
+
+            String displayName = rawName;
+
+            html.replace(
+                "%CUSTOM_CONTENT%",
+                "<a href=\"" + customPages[0].path + "\" class=\"button\">" + displayName + "</a>"
+            );
+
+        } else {
+            html.replace("%CUSTOM_CONTENT%", "");
+        }
         request->send(200, "text/html", html.c_str());
     });
 
+    server->on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(200, "text/css", otadash_css);
+    });
+
     server->on("/info", HTTP_GET, [this](AsyncWebServerRequest *request){
+        isOnDebugPage = false;
         String infoHtml = device_info_html;
         String deviceInfo;
         deviceInfo =  "<tr><td>Product Name</td><td>"               + productName                                       + "</td></tr>";
         deviceInfo += "<tr><td>Firmware Version</td><td>"           + firmwareVersion                                   + "</td></tr>";
-        deviceInfo +=  "<tr><td>Chip Model</td><td>"                 + String(ESP.getChipModel())                        + "</td></tr>";
+        deviceInfo +=  "<tr><td>Chip Model</td><td>"                + String(ESP.getChipModel())                        + "</td></tr>";
         deviceInfo += "<tr><td>Chip Cores</td><td>"                 + String(ESP.getChipCores())                        + "</td></tr>";
         deviceInfo += "<tr><td>Chip Revision</td><td>"              + String(ESP.getChipRevision())                     + "</td></tr>";
         deviceInfo += "<tr><td>CPU Frequency</td><td>"              + String(ESP.getCpuFreqMHz())                       + " MHz</td></tr>";
@@ -324,14 +362,22 @@ void OTADash::setupServer() {
     });
 
     server->on("/about", HTTP_GET, [this](AsyncWebServerRequest *request){
+        isOnDebugPage = false;
         request->send(200, "text/html", about_html);
     });
 
     server->on("/wifimanage", HTTP_GET, [this](AsyncWebServerRequest *request) {
-        Serial.println("[OTADash]: Wi-Fi scan requested");
-        WiFi.scanNetworks(true);                                                                                    // Start scanning
         String html = wifi_manage_html;
         request->send(200, "text/html", html.c_str());
+        if(currentMode != NetworkMode::ACCESS_POINT && currentMode != NetworkMode::DUAL) {
+            OTADASH_LOGGER(warn, "Wi-Fi scan Skipped (Not in AP or Dual mode)");
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            publishCachedScanResults();
+        } else {
+            OTADASH_LOGGER(info, "Wi-Fi scan requested");
+            WiFi.scanNetworks(true);
+            scanWiFi = true;
+        }
     });
 
     server->on("/save-wifi", HTTP_POST, [this](AsyncWebServerRequest *request) {
@@ -348,15 +394,15 @@ void OTADash::setupServer() {
                 return;
             }
             
-            Serial.println("[OTADash]: WIFI Saved Request Received");
+            OTADASH_LOGGER(info, "WIFI Saved Request Received");
 
-            if (wifiSavedCallback) {                                                                                // Call the user-defined callback if set
+            if (wifiSavedCallback) {                                                                                    // Call the user-defined callback if set
                 wifiSavedCallback(ssid, password);
                 request->send(200, "text/plain", "WiFi credentials saved");
             } else {
-                Serial.println("[OTADash]: SSID:     " + ssid);
-                Serial.println("[OTADash]: Password: " + password);
-                Serial.println("[OTADash]: Missing Saving Callback, Using Default Method");
+                OTADASH_LOGGER(info, "SSID:     %s", ssid.c_str());
+                OTADASH_LOGGER(info, "Password: %s", password.c_str());
+                OTADASH_LOGGER(info, "Missing Saving Callback, Using Default Method");
                 strcpy(networkCredentials.ssid, ssid.c_str());
                 strcpy(networkCredentials.password, password.c_str());
                 strcpy(networkCredentials.setuped, "true");
@@ -397,6 +443,11 @@ void OTADash::setupServer() {
         isOnDebugPage = true;
         html.replace("%PORTAL_HEADING%", portal_title);
         request->send(200, "text/html", html.c_str());
+        
+        if (debugLogs.length() > 0) {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            ws->textAll(debugLogs);
+        }
     });
 
     server->on("/restart", HTTP_GET, [this](AsyncWebServerRequest *request){
@@ -406,7 +457,7 @@ void OTADash::setupServer() {
 
     server->on("/restart", HTTP_POST, [this](AsyncWebServerRequest *request){
         request->send(200, "text/html", "Device is restarting...<br/>Please wait a moment.");
-        vTaskDelay(1000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         ESP.restart();
     });
 
@@ -435,7 +486,7 @@ void OTADash::setupServer() {
 
     server->on("/pair", HTTP_POST, [this](AsyncWebServerRequest *request) {
     }, nullptr, [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) { 
-        Serial.println("[OTADash]: Pairing request received");      
+        OTADASH_LOGGER(info, "Pairing request received");      
         if (len == 0) {
             AsyncWebServerResponse *response = request->beginResponse(400, "application/json", "{\"status\":\"error\",\"message\":\"Empty request body\"}");
             response->addHeader("Access-Control-Allow-Origin", "*");
@@ -473,31 +524,44 @@ void OTADash::setupServer() {
             return;
         }
         
-        Serial.println("[OTADash]: Received Pairing Data:");
+        OTADASH_LOGGER(info, "Received Pairing Data:");
         for (size_t i = 0; i < user_ids.size(); i++) {
-            Serial.println("[OTADash]: User ID:       " + String((const char*)user_ids[i]));
+            OTADASH_LOGGER(info, "User ID:       %s", (const char*)user_ids[i]);
         }
-        Serial.println("[OTADash]: WiFi SSID:     " + wifi_ssid);
-        Serial.println("[OTADash]: WiFi Password: " + wifi_password);
-        Serial.println("[OTADash]: Master PIN:    " + master_pin);
-
+        OTADASH_LOGGER(info, "WiFi SSID:     %s", wifi_ssid.c_str());
+        OTADASH_LOGGER(info, "WiFi Password: %s", wifi_password.c_str());
+        OTADASH_LOGGER(info, "Master PIN:    %s", master_pin.c_str());
         AsyncWebServerResponse *response;
 
         if(pairingCallback) {
             pairingCallback(jsonDoc);
             response = request->beginResponse(202, "application/json", "{\"status\":\"success\",\"message\":\"Request Accepted: Listen On Websocket\"}");
         } else {
-            Serial.println("[OTADash]: Missing Pairing Callback");
+            OTADASH_LOGGER(info, "Missing Pairing Callback");
             response = request->beginResponse(500, "application/json", "{\"status\":\"error\",\"message\":\"Missing Pairing Functionality\"}");
         }
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
     });
+
+    // Setup custom page routes
+    setupCustomPageRoutes();
 }
 
 bool OTADash::startStation() {
+    scanWiFi = true;
+    WiFi.scanNetworks(true);                                                                                        // Start scanning
+    while(visibleNetworksCount < 0) {
+        handleClient();
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
     WiFi.mode(WIFI_STA);
     return connectToWifi(networkCredentials.ssid, networkCredentials.password);
+}
+
+void OTADash::reconnectWifi() {
+    disconnectWifi();
+    connectToWifi(ssid, password, 5000);
 }
 
 bool OTADash::startDualMode() {
@@ -505,7 +569,7 @@ bool OTADash::startDualMode() {
     WiFi.mode(WIFI_AP_STA);
     result = WiFi.softAP(String(ssid + String("_AP")).c_str(), password);
     if (!connectToWifi(ssid, password)) {
-        Serial.println("[OTADash]: Failed to connect in Dual mode");
+        OTADASH_LOGGER(info, "Failed to connect in Dual mode");
         return false;
     }
     return true && result;
@@ -514,11 +578,6 @@ bool OTADash::startDualMode() {
 bool OTADash::startAccessPoint() {
     WiFi.mode(WIFI_AP);
     return WiFi.softAP(ssid, password);
-}
-
-void OTADash::reconnectWifi() {
-    disconnectWifi();
-    connectToWifi(ssid, password, 5000);
 }
 
 void OTADash::handleUpdate(AsyncWebServerRequest *request) {
@@ -533,45 +592,40 @@ void OTADash::handleUpdate(AsyncWebServerRequest *request) {
     request->send(response);
 
     xTaskCreate([](void *param) {
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
         ESP.restart();
         vTaskDelete(NULL);
     }, "ota_restart", 2048, NULL, 1, NULL);
 }
 
 void OTADash::handleUpload(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
-    try {
-        if (!index) {
-            Serial.printf("[OTADash]: Update Start: %s\n", filename.c_str());
-            if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { 
-                Update.printError(Serial);
-            }
+    if (!index) {
+        OTADASH_LOGGER(info, "Update Start: %s", filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { 
+            Update.printError(Serial);
         }
-        if (!Update.hasError()) {
-            if (Update.write(data, len) != len) {
-                Update.printError(Serial);
-            }
+    }
+    if (!Update.hasError()) {
+        if (Update.write(data, len) != len) {
+            Update.printError(Serial);
         }
-        if (final) {
-            if (Update.end(true)) {
-                Serial.printf("[OTADash]: Update Success: %u B\n", index + len);
-            } else {
-                Update.printError(Serial);
-            }
+    }
+    if (final) {
+        if (Update.end(true)) {
+            OTADASH_LOGGER(info, "Update Success: %u B", index + len);
+        } else {
+            Update.printError(Serial);
         }
-    } catch (const std::exception& e) {
-        Serial.print("[OTADash]: Update error: ");
-        Serial.println(e.what());
     }
 }
 
 void OTADash::handlePairingResult() {
     String response;
     if(pairResult) {
-        Serial.println("[OTADash]: Pairing successful");
+        OTADASH_LOGGER(info, "Pairing successful");
         response = "{\"status\":\"success\",\"message\":\"Pairing successful\"}";
     } else {
-        Serial.println("[OTADash]: Pairing failed");
+        OTADASH_LOGGER(info, "Pairing failed");
         response = "{\"status\":\"error\",\"message\":\"Pairing failed\"}";
     }
     pairRequest = pairResult = false;
@@ -585,25 +639,23 @@ void OTADash::otaDashTask(void *parameter) {
     
     while(dash->serverStarted) {
         dash->handleClient();
-        vTaskDelay(10);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
 
-        // Initialize mDNS once WiFi is connected in STATION or DUAL mode
         if (!mdnsInitialized && (dash->currentMode == NetworkMode::STATION || dash->currentMode == NetworkMode::DUAL)) {
             if (WiFi.status() == WL_CONNECTED && WiFi.localIP() != IPAddress(0, 0, 0, 0)) {
-                // Extract hostname without .local suffix
                 String hostName = dash->getCustomDomain();
                 if (hostName.endsWith(".local")) {
-                    hostName.remove(hostName.length() - 6);  // Remove ".local"
+                    hostName.remove(hostName.length() - 6);
                 }
                 
                 if (MDNS.begin(hostName.c_str())) {
                     dash->mdnsStarted = true;
                     MDNS.addService("http", "tcp", 80);
-                    Serial.println("[OTADash]: mDNS started successfully!");
-                    Serial.println("[OTADash]: Access via: http://" + dash->getCustomDomain());
+                    OTADASH_LOGGER(info, "mDNS started successfully!");
+                    OTADASH_LOGGER(info, "Access via: http://%s", dash->getCustomDomain().c_str());
                     mdnsInitialized = true;
                 } else {
-                    Serial.println("[OTADash]: Failed to start mDNS - retrying...");
+                    OTADASH_LOGGER(info, "Failed to start mDNS - retrying...");
                 }
             }
         }
@@ -614,7 +666,7 @@ void OTADash::otaDashTask(void *parameter) {
 
             if (!dash->isWifiConnected) {
                 dash->handleNetworkFailure();
-                mdnsInitialized = false;  // Reset so mDNS can reinitialize on reconnect
+                mdnsInitialized = false;
             }
         }
     }
@@ -623,23 +675,37 @@ void OTADash::otaDashTask(void *parameter) {
 
 void OTADash::handleWifiScanResult(int scanResult) {
     if (scanResult == WIFI_SCAN_FAILED) {
-        Serial.println("[OTADash]: Wi-Fi scan failed");
-    } else {       
-        Serial.println("[OTADash]: Wi-Fi scan completed");
+        OTADASH_LOGGER(info, "Wi-Fi scan failed");
+        cachedScanResults = "";
+        cachedScanCount = -1;
+    } else {
+        OTADASH_LOGGER(info, "Wi-Fi scan completed! Found %d networks", scanResult);
         String networks = "[";
         for (int i = 0; i < scanResult; i++) {
             if (i > 0) networks += ",";
             String ssidEscaped = WiFi.SSID(i);
-            ssidEscaped.replace("\"", "\\\""); // Escape quotes
+            ssidEscaped.replace("\"", "\\\"");
             networks += "{\"ssid\":\"" + ssidEscaped + "\",";
             networks += "\"rssi\":" + String(WiFi.RSSI(i)) + ",";
             networks += "\"channel\":" + String(WiFi.channel(i)) + ",";
             networks += "\"encryption\":\"" + encryptionTypeToString(WiFi.encryptionType(i)) + "\"}";
         }
         networks += "]";
-        ws->textAll(networks); // Send the results over WebSocket
+        cachedScanResults = networks;
+        cachedScanCount = scanResult;
+        ws->textAll(networks);
     }
-    WiFi.scanDelete(); // Clear the scan results
+    scanWiFi = false;
+}
+
+void OTADash::publishCachedScanResults() {
+    if (!cachedScanResults.isEmpty()) {
+        ws->textAll(cachedScanResults);
+        OTADASH_LOGGER(info, "Serving cached Wi-Fi scan results (%d networks)", cachedScanCount >= 0 ? cachedScanCount : 0);
+    } else {
+        ws->textAll("[]");
+        OTADASH_LOGGER(info, "No cached Wi-Fi scan results available");
+    }
 }
 
 void OTADash::handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -661,12 +727,12 @@ void OTADash::handleNetworkFailure() {
     
     if (millis() - lastReconnectAttempt >= reconnectDelay) {
         if (reconnectCount < maxReconnectAttempts) {
-            Serial.println("[OTADash]: Attempting to reconnect to WiFi...");
+            OTADASH_LOGGER(info, "Attempting to reconnect to WiFi...");
             reconnectWifi();
             reconnectCount++;
             lastReconnectAttempt = millis();
         } else {
-            Serial.println("[OTADash]: Max reconnection attempts reached");
+            OTADASH_LOGGER(info, "Max reconnection attempts reached");
             reconnectCount = 0;
         }
     }
@@ -674,6 +740,124 @@ void OTADash::handleNetworkFailure() {
 
 void OTADash::onWifiSaved(std::function<void(const String&, const String&)> callback) {
     wifiSavedCallback = callback;
+}
+
+// Custom Page Implementation
+void OTADash::addCustomPage(
+    const String& path, const String& htmlContent, 
+    std::function<String(const String&)> getCallback,
+    std::function<String(const String&)> postCallback
+) {
+    customPages.emplace_back(path, htmlContent, getCallback, postCallback);
+    if (serverStarted) {
+        setupCustomPageRoutes();
+    }
+}
+
+void OTADash::addCustomDataHandler(
+    const String& path,
+    std::function<String(const String&)> getCallback,
+    std::function<String(const String&)> postCallback
+) {
+    auto it = std::find_if(customPages.begin(), customPages.end(), [&path](const CustomPage& page) { return page.path == path; });
+    
+    if (it != customPages.end()) {
+        if (getCallback) it->getCallback = getCallback;
+        if (postCallback) it->postCallback = postCallback;
+    } else {
+        customPages.emplace_back(path, "", getCallback, postCallback);
+    }
+    
+    if (serverStarted) {
+        setupCustomPageRoutes();
+    }
+}
+
+void OTADash::setupCustomPageRoutes() {
+    for (const auto& page : customPages) {
+        if (!page.path.isEmpty()) {
+            if (!page.htmlContent.isEmpty()) {
+                server->on(page.path.c_str(), HTTP_GET, [this, page](AsyncWebServerRequest *request){
+                    handleCustomPageGet(request, page);
+                });
+            }
+
+            String dataPath = page.path + "/data";
+            if (page.getCallback) {
+                server->on(dataPath.c_str(), HTTP_GET, [this, page](AsyncWebServerRequest *request){
+                    handleCustomDataGet(request, page);
+                });
+            }
+
+            if (page.postCallback) {
+                server->on(dataPath.c_str(), HTTP_POST, [this, page](AsyncWebServerRequest *request){
+                }, nullptr, [this, page](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+                    if (len == 0) {
+                        AsyncWebServerResponse *response = request->beginResponse(400, "application/json", "{\"error\":\"Empty request body\"}");
+                        response->addHeader("Access-Control-Allow-Origin", "*");
+                        request->send(response);
+                        return;
+                    }
+
+                    String bodyString;
+                    bodyString.reserve(len + 1);
+                    for (size_t i = 0; i < len; i++) {
+                        bodyString += (char)data[i];
+                    }
+
+                    String response = page.postCallback(bodyString);
+                    
+                    AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", response);
+                    resp->addHeader("Access-Control-Allow-Origin", "*");
+                    resp->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                    resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+                    request->send(resp);
+                });
+                
+                server->on(dataPath.c_str(), HTTP_OPTIONS, [](AsyncWebServerRequest *request){
+                    AsyncWebServerResponse *response = request->beginResponse(204);
+                    response->addHeader("Access-Control-Allow-Origin", "*");
+                    response->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                    response->addHeader("Access-Control-Allow-Headers", "Content-Type");
+                    request->send(response);
+                });
+            }
+        }
+    }
+}
+
+String OTADash::queryParamsToJson(AsyncWebServerRequest *request) {
+    JsonDocument doc;
+    
+    for (size_t i = 0; i < request->params(); i++) {
+        const AsyncWebParameter* p = request->getParam(i);
+        if (p->isPost() == false) {
+            doc[p->name()] = p->value();
+        }
+    }
+    
+    String jsonString;
+    serializeJson(doc, jsonString);
+    return jsonString;
+}
+
+void OTADash::handleCustomPageGet(AsyncWebServerRequest *request, const CustomPage& page) {
+    request->send(200, "text/html", page.htmlContent.c_str());
+}
+
+void OTADash::handleCustomDataGet(AsyncWebServerRequest *request, const CustomPage& page) {
+    if (page.getCallback) {
+        String queryJson = queryParamsToJson(request);
+        String response = page.getCallback(queryJson);
+        
+        AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", response);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        resp->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+        request->send(resp);
+    } else {
+        request->send(404, "application/json", "{\"error\":\"GET handler not configured\"}");
+    }
 }
 
 void OTADash::onPaired(std::function<void(JsonDocument&)> callback) {
