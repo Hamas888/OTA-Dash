@@ -1,69 +1,73 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Wireless Debug</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      display: flex;
-      justify-content: center; 
-      align-items: center;
-      text-align: center; 
-      font-family: "Arial"; 
-      background-color: #e0f7fa; 
-      color: #006064; 
-      margin: 0; 
-      padding: 0; 
-    }
-    .container {
-      width: 400px; 
-      height: auto; 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-    }
-    .log-screen {
-      border: 1px solid #ccc;
-      background-color: #fff;
-      width: 300px;
-      height: 500px;
-      overflow-y: scroll;
-      padding: 10px;
-      text-align: left; 
-    }
-    .button { 
-      padding: 10px 20px; 
-      font-size: 18px; 
-      margin: 10px; 
-      cursor: pointer; 
-      border: none; 
-      border-radius: 5px; 
-      background-color: #00838f; 
-      color: #ffffff; 
-      text-decoration: none; 
-      display: inline-block; 
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
   <div class="container">
     <h1>%PORTAL_HEADING% Debug Logs</h1>
-    <div class="log-screen" id="logs"></div>
-    <a href="/" class="button">Back</a>
+
+    <div class="log-screen" id="logs">
+      <span style="color: #888888;">[Debug Console Ready - Waiting for messages...]</span><br />
+    </div>
+
+    <div style="margin-top: 10px;">
+      <button onclick="clearLogs()" class="button" style="margin-right: 10px;">Clear Logs</button>
+      <a href="/" class="button">Back</a>
+    </div>
   </div>
+
   <script>
-    var ws = new WebSocket(`ws://${window.location.hostname}/ws`);
-    ws.onmessage = function(event) {
-      var logsDiv = document.getElementById('logs');
-      logsDiv.innerHTML += event.data + "<br/>";
-      logsDiv.scrollTop = logsDiv.scrollHeight; // Auto-scroll to the bottom
-    };
+    let ws;
+    const reconnectInterval = 5000;
+
+    function connectWebSocket() {
+      try {
+        ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+        ws.onopen = () => {
+          console.log("WebSocket connected");
+          appendLog("[WebSocket Connected]", "#00ff00");
+        };
+
+        ws.onmessage = (event) => {
+          const logsDiv = document.getElementById("logs");
+          logsDiv.innerHTML += event.data + "<br/>";
+          logsDiv.scrollTop = logsDiv.scrollHeight;
+        };
+
+        ws.onclose = () => {
+          console.log("WebSocket disconnected");
+          appendLog("[WebSocket Disconnected - Reconnecting...]", "#ff0000");
+          setTimeout(connectWebSocket, reconnectInterval);
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          appendLog("[WebSocket Error]", "#ff0000");
+        };
+      } catch (e) {
+        console.error("Failed to create WebSocket:", e);
+        appendLog("[Failed to connect WebSocket]", "#ff0000");
+        setTimeout(connectWebSocket, reconnectInterval);
+      }
+    }
+
+    function appendLog(message, color) {
+      const logsDiv = document.getElementById("logs");
+      logsDiv.innerHTML += `<span style="color: ${color};">${message}</span><br/>`;
+    }
+
+    function clearLogs() {
+      document.getElementById("logs").innerHTML =
+        '<span style="color: #888888;">[Debug Console Cleared]</span><br/>';
+    }
+
+    connectWebSocket();
   </script>
 </body>
 </html>

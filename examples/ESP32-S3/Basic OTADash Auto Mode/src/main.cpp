@@ -5,7 +5,7 @@ OTADash* otaDash = new OTADash("OTADash", "", "ota-dash", "OTA Dash");
 
 void setup() {
   Serial.begin(115200);
-  otaDash-setProductName("OTA Dash Tester");
+  otaDash->setProductName("OTA Dash Tester");
   otaDash->setFirmwareVersion("1.0.0");
   otaDash->begin(AUTO);
 }

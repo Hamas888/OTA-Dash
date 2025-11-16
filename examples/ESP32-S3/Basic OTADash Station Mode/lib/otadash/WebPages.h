@@ -1,9 +1,9 @@
-/*
+   /*
  ====================================================================================================
  * File:        WebPages.h
  * Author:      Hamas Saeed
- * Version:     Rev_1.1.0
- * Date:        Nov 13 2025
+ * Version:     Rev_1.0.0
+ * Date:        Feb 10 2025
  * Brief:       This File Contains HTML Templates For Web Pages Used In OTADash
  * 
  ====================================================================================================
@@ -55,21 +55,16 @@ static const char index_html[] = R"rawliteral(
 <body>
   <div class="container">
     <h1>%PORTAL_HEADING%</h1>
-    %CUSTOM_CONTENT%
     <a href="/info" class="button">Device Info</a>
     <a href="/wifimanage" class="button">Manage WIFI</a>
     <a href="/debug" class="button">Wireless Debug</a>
     <a href="/update" class="button">Update Firmware</a>
     <a href="/erase" class="button">Erase Settings</a>
     <a href="/restart" class="button">Restart Device</a>
-    <a href="/about" class="button">About</a>
     <div class="separator"></div> 
     <div class="note">
       <h5>Note</h5>
       If the update function isn't working, open the portal in your browser: <a href="http://%CUSTOM_DOMAIN%">%CUSTOM_DOMAIN%</a>
-    </div>
-    <div class="footer">
-      Developed by <a href="https://github.com/Hamas888" target="_blank">Hamas Saeed</a>
     </div>
   </div>
 </body>
@@ -92,6 +87,10 @@ static const char device_info_html[] = R"rawliteral(
       %DEVICE_INFO%
     </table>
     <a href="/" class="button">Back</a>
+    <a href="/about" class="button">About</a>
+    <div class="footer">
+      Developed by <a href="https://github.com/Hamas888" target="_blank">Hamas Saeed</a>
+    </div>
   </div>
 </body>
 </html>
@@ -495,7 +494,10 @@ static const char about_html[] = R"rawliteral(
       <p>MIT License - Free for personal and commercial use</p>
     </div>
 
+    <div class="separator"></div>
+
     <a href="/" class="button">Home</a>
+    <a href="/info" class="button">Device Info</a>
   </div>
 </body>
 </html>
