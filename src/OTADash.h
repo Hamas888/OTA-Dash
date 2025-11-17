@@ -48,11 +48,14 @@
 #include <ESPmDNS.h>
 #include <functional>
 #include "ArduinoJson.h"
+#include "OTADashConfig.h"
 
 #define OTA_DASH_VERSION "1.1.0"
 
-#ifndef OTADASH_DEBUG_ENABLED
+#ifdef OTADASH_DEBUG
     #define OTADASH_DEBUG_ENABLED 1
+#else
+    #define OTADASH_DEBUG_ENABLED 0
 #endif
 
 #if OTADASH_DEBUG_ENABLED

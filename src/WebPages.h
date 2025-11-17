@@ -392,7 +392,7 @@ const char debug_html[] = R"rawliteral(
     <h1>%PORTAL_HEADING% Debug Logs</h1>
 
     <div class="log-screen" id="logs">
-      <span style="color: #888888;">[Debug Console Ready - Waiting for messages...]</span><br />
+      <span style="color: #888888;">Debug Console Ready - Waiting for messages...</span>
     </div>
 
     <div style="margin-top: 10px;">
@@ -411,7 +411,7 @@ const char debug_html[] = R"rawliteral(
 
         ws.onopen = () => {
           console.log("WebSocket connected");
-          appendLog("[WebSocket Connected]", "#00ff00");
+          appendLog("WebSocket Connected", "#00ff00");
         };
 
         ws.onmessage = (event) => {
@@ -422,29 +422,29 @@ const char debug_html[] = R"rawliteral(
 
         ws.onclose = () => {
           console.log("WebSocket disconnected");
-          appendLog("[WebSocket Disconnected - Reconnecting...]", "#ff0000");
+          appendLog("WebSocket Disconnected - Reconnecting...", "#ff0000");
           setTimeout(connectWebSocket, reconnectInterval);
         };
 
         ws.onerror = (error) => {
           console.error("WebSocket error:", error);
-          appendLog("[WebSocket Error]", "#ff0000");
+          appendLog("WebSocket Error", "#ff0000");
         };
       } catch (e) {
         console.error("Failed to create WebSocket:", e);
-        appendLog("[Failed to connect WebSocket]", "#ff0000");
+        appendLog("Failed to connect WebSocket", "#ff0000");
         setTimeout(connectWebSocket, reconnectInterval);
       }
     }
 
     function appendLog(message, color) {
       const logsDiv = document.getElementById("logs");
-      logsDiv.innerHTML += `<span style="color: ${color};">${message}</span><br/>`;
+      logsDiv.innerHTML += `<div style="color: ${color};">${message}</div>`;
     }
 
     function clearLogs() {
       document.getElementById("logs").innerHTML =
-        '<span style="color: #888888;">[Debug Console Cleared]</span><br/>';
+        '<div style="color: #888888;">Debug Console Cleared</div>';
     }
 
     connectWebSocket();
