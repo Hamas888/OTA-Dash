@@ -388,8 +388,8 @@ static const char otadash_css[] = R"rawliteral(
   .log-screen {
     border:             1px solid )rawliteral" WEBPAGES_BORDER_COLOR R"rawliteral(";
     width:              100%;
-    max-width:          400px;
-    min-width:          400px;
+    max-width:          350px;
+    min-width:          300px;
     height:             400px;
     overflow-y:         scroll;
     padding:            10px;
