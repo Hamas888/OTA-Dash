@@ -66,8 +66,10 @@ OTADash::OTADash(const char* ssid, const char* password, const char* custom_doma
 OTADash::~OTADash() {
     stop();
     OTADASH_LOGGER(debug, "OTADash Instance Destroyed");
-    delete otaDashLogger;
-    otaDashLogger = nullptr;
+    #if OTADASH_DEBUG_ENABLED
+        delete otaDashLogger;
+        otaDashLogger = nullptr;
+    #endif
 }
 
 void OTADash::stop() {
